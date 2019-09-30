@@ -1,0 +1,100 @@
+   0  $accept : Program $end
+
+   1  Program : StmtBlock
+
+   2  Exprq :
+   3        | Expr
+
+   4  Expr : T_Identifier
+
+   5  Stmt : Exprq T_Semicolon
+
+   6  Stmts :
+   7        | Stmts Stmt
+
+   8  StmtBlock : T_LBrace Stmts T_RBrace
+
+state 0
+	$accept : . Program $end  (0)
+
+	T_LBrace  shift 1
+	.  error
+
+	Program  goto 2
+	StmtBlock  goto 3
+
+
+state 1
+	StmtBlock : T_LBrace . Stmts T_RBrace  (8)
+	Stmts : .  (6)
+
+	.  reduce 6
+
+	Stmts  goto 4
+
+
+state 2
+	$accept : Program . $end  (0)
+
+	$end  accept
+
+
+state 3
+	Program : StmtBlock .  (1)
+
+	.  reduce 1
+
+
+state 4
+	Stmts : Stmts . Stmt  (7)
+	StmtBlock : T_LBrace Stmts . T_RBrace  (8)
+	Exprq : .  (2)
+
+	T_Identifier  shift 5
+	T_RBrace  shift 6
+	T_Semicolon  reduce 2
+
+	Exprq  goto 7
+	Expr  goto 8
+	Stmt  goto 9
+
+
+state 5
+	Expr : T_Identifier .  (4)
+
+	.  reduce 4
+
+
+state 6
+	StmtBlock : T_LBrace Stmts T_RBrace .  (8)
+
+	.  reduce 8
+
+
+state 7
+	Stmt : Exprq . T_Semicolon  (5)
+
+	T_Semicolon  shift 10
+	.  error
+
+
+state 8
+	Exprq : Expr .  (3)
+
+	.  reduce 3
+
+
+state 9
+	Stmts : Stmts Stmt .  (7)
+
+	.  reduce 7
+
+
+state 10
+	Stmt : Exprq T_Semicolon .  (5)
+
+	.  reduce 5
+
+
+54 terminals, 7 nonterminals
+9 grammar rules, 11 states
