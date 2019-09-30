@@ -1,0 +1,7 @@
+void main()
+{
+    string [] myary;
+    myary[0] = "A";
+    myary[1] = "B";
+    Print("Hello World!");
+}
