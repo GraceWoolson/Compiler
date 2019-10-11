@@ -1,100 +1,543 @@
    0  $accept : Program $end
 
-   1  Program : StmtBlock
+   1  Program : Decls
 
-   2  Exprq :
-   3        | Expr
+   2  Decls : Decl
+   3        | Decls Decl
 
-   4  Expr : T_Identifier
+   4  Decl : VariableDecl
+   5       | FunctionDecl
 
-   5  Stmt : Exprq T_Semicolon
+   6  VariableDecl : Variable T_Semicolon
 
-   6  Stmts :
-   7        | Stmts Stmt
+   7  Variable : Type Y_Identifier
 
-   8  StmtBlock : T_LBrace Stmts T_RBrace
+   8  FunctionDecl : Type Y_Identifier T_LParen Formalsq T_RParen StmtBlock
+
+   9  Formalsq :
+  10           | Formals
+
+  11  Formals : Variable
+  12          | Formals T_Comma Variable
+
+  13  StmtBlock : T_LBrace StmtVarsq Stmtsq T_RBrace
+
+  14  StmtVarsq :
+  15            | StmtVars
+
+  16  StmtVars : VariableDecl
+  17           | StmtVars VariableDecl
+
+  18  Stmtsq :
+  19         | Stmts
+
+  20  Stmts : Stmt T_Semicolon
+  21        | Stmts Stmt T_Semicolon
+
+  22  Stmt : Y_Identifier Y_Minus Y_Identifier
+
+  23  Type : Primtype
+  24       | Usertype
+  25       | Lsttype
+
+  26  Primtype : Y_Int
+  27           | Y_Double
+  28           | Y_Bool
+  29           | Y_String
+
+  30  Usertype : Y_TypeIdentifier
+
+  31  Lsttype : Type T_LBracket T_RBracket
+
+  32  Y_Int : T_Int
+
+  33  Y_Double : T_Double
+
+  34  Y_Bool : T_Bool
+
+  35  Y_String : T_String
+
+  36  Y_TypeIdentifier : T_TypeIdentifier
+
+  37  Y_Identifier : T_Identifier
+
+  38  Y_Minus : T_Minus
 
 state 0
 	$accept : . Program $end  (0)
 
-	T_LBrace  shift 1
+	T_Int  shift 1
+	T_Double  shift 2
+	T_Bool  shift 3
+	T_String  shift 4
+	T_TypeIdentifier  shift 5
 	.  error
 
-	Program  goto 2
-	StmtBlock  goto 3
+	Program  goto 6
+	Decls  goto 7
+	Decl  goto 8
+	VariableDecl  goto 9
+	FunctionDecl  goto 10
+	Variable  goto 11
+	Type  goto 12
+	Primtype  goto 13
+	Usertype  goto 14
+	Lsttype  goto 15
+	Y_Int  goto 16
+	Y_Double  goto 17
+	Y_Bool  goto 18
+	Y_String  goto 19
+	Y_TypeIdentifier  goto 20
 
 
 state 1
-	StmtBlock : T_LBrace . Stmts T_RBrace  (8)
-	Stmts : .  (6)
+	Y_Int : T_Int .  (32)
 
-	.  reduce 6
-
-	Stmts  goto 4
+	.  reduce 32
 
 
 state 2
+	Y_Double : T_Double .  (33)
+
+	.  reduce 33
+
+
+state 3
+	Y_Bool : T_Bool .  (34)
+
+	.  reduce 34
+
+
+state 4
+	Y_String : T_String .  (35)
+
+	.  reduce 35
+
+
+state 5
+	Y_TypeIdentifier : T_TypeIdentifier .  (36)
+
+	.  reduce 36
+
+
+state 6
 	$accept : Program . $end  (0)
 
 	$end  accept
 
 
-state 3
-	Program : StmtBlock .  (1)
+state 7
+	Program : Decls .  (1)
+	Decls : Decls . Decl  (3)
 
-	.  reduce 1
+	T_Int  shift 1
+	T_Double  shift 2
+	T_Bool  shift 3
+	T_String  shift 4
+	T_TypeIdentifier  shift 5
+	$end  reduce 1
+
+	Decl  goto 21
+	VariableDecl  goto 9
+	FunctionDecl  goto 10
+	Variable  goto 11
+	Type  goto 12
+	Primtype  goto 13
+	Usertype  goto 14
+	Lsttype  goto 15
+	Y_Int  goto 16
+	Y_Double  goto 17
+	Y_Bool  goto 18
+	Y_String  goto 19
+	Y_TypeIdentifier  goto 20
 
 
-state 4
-	Stmts : Stmts . Stmt  (7)
-	StmtBlock : T_LBrace Stmts . T_RBrace  (8)
-	Exprq : .  (2)
+state 8
+	Decls : Decl .  (2)
 
-	T_Identifier  shift 5
-	T_RBrace  shift 6
-	T_Semicolon  reduce 2
-
-	Exprq  goto 7
-	Expr  goto 8
-	Stmt  goto 9
+	.  reduce 2
 
 
-state 5
-	Expr : T_Identifier .  (4)
+state 9
+	Decl : VariableDecl .  (4)
 
 	.  reduce 4
 
 
-state 6
-	StmtBlock : T_LBrace Stmts T_RBrace .  (8)
-
-	.  reduce 8
-
-
-state 7
-	Stmt : Exprq . T_Semicolon  (5)
-
-	T_Semicolon  shift 10
-	.  error
-
-
-state 8
-	Exprq : Expr .  (3)
-
-	.  reduce 3
-
-
-state 9
-	Stmts : Stmts Stmt .  (7)
-
-	.  reduce 7
-
-
 state 10
-	Stmt : Exprq T_Semicolon .  (5)
+	Decl : FunctionDecl .  (5)
 
 	.  reduce 5
 
 
-54 terminals, 7 nonterminals
-9 grammar rules, 11 states
+state 11
+	VariableDecl : Variable . T_Semicolon  (6)
+
+	T_Semicolon  shift 22
+	.  error
+
+
+state 12
+	Variable : Type . Y_Identifier  (7)
+	FunctionDecl : Type . Y_Identifier T_LParen Formalsq T_RParen StmtBlock  (8)
+	Lsttype : Type . T_LBracket T_RBracket  (31)
+
+	T_Identifier  shift 23
+	T_LBracket  shift 24
+	.  error
+
+	Y_Identifier  goto 25
+
+
+state 13
+	Type : Primtype .  (23)
+
+	.  reduce 23
+
+
+state 14
+	Type : Usertype .  (24)
+
+	.  reduce 24
+
+
+state 15
+	Type : Lsttype .  (25)
+
+	.  reduce 25
+
+
+state 16
+	Primtype : Y_Int .  (26)
+
+	.  reduce 26
+
+
+state 17
+	Primtype : Y_Double .  (27)
+
+	.  reduce 27
+
+
+state 18
+	Primtype : Y_Bool .  (28)
+
+	.  reduce 28
+
+
+state 19
+	Primtype : Y_String .  (29)
+
+	.  reduce 29
+
+
+state 20
+	Usertype : Y_TypeIdentifier .  (30)
+
+	.  reduce 30
+
+
+state 21
+	Decls : Decls Decl .  (3)
+
+	.  reduce 3
+
+
+state 22
+	VariableDecl : Variable T_Semicolon .  (6)
+
+	.  reduce 6
+
+
+state 23
+	Y_Identifier : T_Identifier .  (37)
+
+	.  reduce 37
+
+
+state 24
+	Lsttype : Type T_LBracket . T_RBracket  (31)
+
+	T_RBracket  shift 26
+	.  error
+
+
+state 25
+	Variable : Type Y_Identifier .  (7)
+	FunctionDecl : Type Y_Identifier . T_LParen Formalsq T_RParen StmtBlock  (8)
+
+	T_LParen  shift 27
+	T_Semicolon  reduce 7
+
+
+state 26
+	Lsttype : Type T_LBracket T_RBracket .  (31)
+
+	.  reduce 31
+
+
+state 27
+	FunctionDecl : Type Y_Identifier T_LParen . Formalsq T_RParen StmtBlock  (8)
+	Formalsq : .  (9)
+
+	T_Int  shift 1
+	T_Double  shift 2
+	T_Bool  shift 3
+	T_String  shift 4
+	T_TypeIdentifier  shift 5
+	T_RParen  reduce 9
+
+	Variable  goto 28
+	Type  goto 29
+	Formalsq  goto 30
+	Formals  goto 31
+	Primtype  goto 13
+	Usertype  goto 14
+	Lsttype  goto 15
+	Y_Int  goto 16
+	Y_Double  goto 17
+	Y_Bool  goto 18
+	Y_String  goto 19
+	Y_TypeIdentifier  goto 20
+
+
+state 28
+	Formals : Variable .  (11)
+
+	.  reduce 11
+
+
+state 29
+	Variable : Type . Y_Identifier  (7)
+	Lsttype : Type . T_LBracket T_RBracket  (31)
+
+	T_Identifier  shift 23
+	T_LBracket  shift 24
+	.  error
+
+	Y_Identifier  goto 32
+
+
+state 30
+	FunctionDecl : Type Y_Identifier T_LParen Formalsq . T_RParen StmtBlock  (8)
+
+	T_RParen  shift 33
+	.  error
+
+
+state 31
+	Formalsq : Formals .  (10)
+	Formals : Formals . T_Comma Variable  (12)
+
+	T_Comma  shift 34
+	T_RParen  reduce 10
+
+
+state 32
+	Variable : Type Y_Identifier .  (7)
+
+	.  reduce 7
+
+
+state 33
+	FunctionDecl : Type Y_Identifier T_LParen Formalsq T_RParen . StmtBlock  (8)
+
+	T_LBrace  shift 35
+	.  error
+
+	StmtBlock  goto 36
+
+
+state 34
+	Formals : Formals T_Comma . Variable  (12)
+
+	T_Int  shift 1
+	T_Double  shift 2
+	T_Bool  shift 3
+	T_String  shift 4
+	T_TypeIdentifier  shift 5
+	.  error
+
+	Variable  goto 37
+	Type  goto 29
+	Primtype  goto 13
+	Usertype  goto 14
+	Lsttype  goto 15
+	Y_Int  goto 16
+	Y_Double  goto 17
+	Y_Bool  goto 18
+	Y_String  goto 19
+	Y_TypeIdentifier  goto 20
+
+
+state 35
+	StmtBlock : T_LBrace . StmtVarsq Stmtsq T_RBrace  (13)
+	StmtVarsq : .  (14)
+
+	T_Int  shift 1
+	T_Double  shift 2
+	T_Bool  shift 3
+	T_String  shift 4
+	T_TypeIdentifier  shift 5
+	T_Identifier  reduce 14
+	T_RBrace  reduce 14
+
+	VariableDecl  goto 38
+	Variable  goto 11
+	Type  goto 29
+	StmtVarsq  goto 39
+	StmtVars  goto 40
+	Primtype  goto 13
+	Usertype  goto 14
+	Lsttype  goto 15
+	Y_Int  goto 16
+	Y_Double  goto 17
+	Y_Bool  goto 18
+	Y_String  goto 19
+	Y_TypeIdentifier  goto 20
+
+
+state 36
+	FunctionDecl : Type Y_Identifier T_LParen Formalsq T_RParen StmtBlock .  (8)
+
+	.  reduce 8
+
+
+state 37
+	Formals : Formals T_Comma Variable .  (12)
+
+	.  reduce 12
+
+
+state 38
+	StmtVars : VariableDecl .  (16)
+
+	.  reduce 16
+
+
+state 39
+	StmtBlock : T_LBrace StmtVarsq . Stmtsq T_RBrace  (13)
+	Stmtsq : .  (18)
+
+	T_Identifier  shift 23
+	T_RBrace  reduce 18
+
+	Y_Identifier  goto 41
+	Stmtsq  goto 42
+	Stmts  goto 43
+	Stmt  goto 44
+
+
+state 40
+	StmtVarsq : StmtVars .  (15)
+	StmtVars : StmtVars . VariableDecl  (17)
+
+	T_Int  shift 1
+	T_Double  shift 2
+	T_Bool  shift 3
+	T_String  shift 4
+	T_TypeIdentifier  shift 5
+	T_Identifier  reduce 15
+	T_RBrace  reduce 15
+
+	VariableDecl  goto 45
+	Variable  goto 11
+	Type  goto 29
+	Primtype  goto 13
+	Usertype  goto 14
+	Lsttype  goto 15
+	Y_Int  goto 16
+	Y_Double  goto 17
+	Y_Bool  goto 18
+	Y_String  goto 19
+	Y_TypeIdentifier  goto 20
+
+
+state 41
+	Stmt : Y_Identifier . Y_Minus Y_Identifier  (22)
+
+	T_Minus  shift 46
+	.  error
+
+	Y_Minus  goto 47
+
+
+state 42
+	StmtBlock : T_LBrace StmtVarsq Stmtsq . T_RBrace  (13)
+
+	T_RBrace  shift 48
+	.  error
+
+
+state 43
+	Stmtsq : Stmts .  (19)
+	Stmts : Stmts . Stmt T_Semicolon  (21)
+
+	T_Identifier  shift 23
+	T_RBrace  reduce 19
+
+	Y_Identifier  goto 41
+	Stmt  goto 49
+
+
+state 44
+	Stmts : Stmt . T_Semicolon  (20)
+
+	T_Semicolon  shift 50
+	.  error
+
+
+state 45
+	StmtVars : StmtVars VariableDecl .  (17)
+
+	.  reduce 17
+
+
+state 46
+	Y_Minus : T_Minus .  (38)
+
+	.  reduce 38
+
+
+state 47
+	Stmt : Y_Identifier Y_Minus . Y_Identifier  (22)
+
+	T_Identifier  shift 23
+	.  error
+
+	Y_Identifier  goto 51
+
+
+state 48
+	StmtBlock : T_LBrace StmtVarsq Stmtsq T_RBrace .  (13)
+
+	.  reduce 13
+
+
+state 49
+	Stmts : Stmts Stmt . T_Semicolon  (21)
+
+	T_Semicolon  shift 52
+	.  error
+
+
+state 50
+	Stmts : Stmt T_Semicolon .  (20)
+
+	.  reduce 20
+
+
+state 51
+	Stmt : Y_Identifier Y_Minus Y_Identifier .  (22)
+
+	.  reduce 22
+
+
+state 52
+	Stmts : Stmts Stmt T_Semicolon .  (21)
+
+	.  reduce 21
+
+
+54 terminals, 26 nonterminals
+39 grammar rules, 53 states

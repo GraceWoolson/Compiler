@@ -132,38 +132,65 @@ extern int YYPARSE_DECL();
 #define T_RBrace 52
 #define YYERRCODE 256
 static const short yylhs[] = {                           -1,
-    0,    2,    2,    3,    4,    5,    5,    1,
+    0,    1,    1,    2,    2,    3,    5,    4,    8,    8,
+   10,   10,    9,   11,   11,   13,   13,   12,   12,   14,
+   14,   15,    6,    6,    6,   17,   17,   17,   17,   18,
+   19,   20,   21,   22,   23,   24,    7,   16,
 };
 static const short yylen[] = {                            2,
-    1,    0,    1,    1,    2,    0,    2,    3,
+    1,    1,    2,    1,    1,    2,    2,    6,    0,    1,
+    1,    3,    4,    0,    1,    1,    2,    0,    1,    2,
+    3,    3,    1,    1,    1,    1,    1,    1,    1,    1,
+    3,    1,    1,    1,    1,    1,    1,    1,
 };
 static const short yydefred[] = {                         0,
-    6,    0,    1,    0,    4,    8,    0,    3,    7,    5,
+   32,   33,   34,   35,   36,    0,    0,    2,    4,    5,
+    0,    0,   23,   24,   25,   26,   27,   28,   29,   30,
+    3,    6,   37,    0,    0,   31,    0,   11,    0,    0,
+    0,    7,    0,    0,    0,    8,   12,   16,    0,    0,
+    0,    0,    0,    0,   17,   38,    0,   13,    0,   20,
+   22,   21,
 };
-static const short yydgoto[] = {                          2,
-    3,    7,    8,    9,    4,
+static const short yydgoto[] = {                          6,
+    7,    8,    9,   10,   11,   29,   41,   30,   36,   31,
+   39,   42,   40,   43,   44,   47,   13,   14,   15,   16,
+   17,   18,   19,   20,
 };
-static const short yysindex[] = {                       -50,
-    0,    0,    0,  -23,    0,    0,  -42,    0,    0,    0,
+static const short yysindex[] = {                         2,
+    0,    0,    0,    0,    0,    0,    2,    0,    0,    0,
+  -34,  -20,    0,    0,    0,    0,    0,    0,    0,    0,
+    0,    0,    0,  -37,  -36,    0,    2,    0,  -20,  -38,
+  -31,    0,  -32,    2,    2,    0,    0,    0,   -3,    2,
+   -9,  -30,   -3,  -16,    0,    0,   -3,    0,  -15,    0,
+    0,    0,
 };
 static const short yyrindex[] = {                         0,
-    0,    0,    0,  -41,    0,    0,    0,    0,    0,    0,
+    0,    0,    0,    0,    0,    0,   24,    0,    0,    0,
+    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+    0,    0,    0,    0,  -11,    0,  -25,    0,    0,    0,
+  -18,    0,    0,    0,  -22,    0,    0,    0,  -14,  -21,
+    0,    0,  -13,    0,    0,    0,    0,    0,    0,    0,
+    0,    0,
 };
 static const short yygindex[] = {                         0,
-    0,    0,    0,    0,    0,
+    0,   27,  -17,    0,  -19,    9,  -12,    0,    0,    0,
+    0,    0,    0,    0,   -7,    0,    0,    0,    0,    0,
+    0,    0,    0,    0,
 };
-#define YYTABLESIZE 29
-static const short yytable[] = {                          5,
-    1,   10,    2,    0,    0,    0,    0,    0,    0,    0,
-    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-    0,    0,    0,    0,    0,    0,    0,    0,    6,
+#define YYTABLESIZE 39
+static const short yytable[] = {                         25,
+   14,   15,   23,    1,    2,    3,    4,   28,   12,   22,
+   26,   33,   27,   34,   37,   12,   32,   38,   35,   23,
+   46,   48,   45,    1,    9,    5,   24,   50,   52,   14,
+   15,   10,    7,   21,   51,   49,    0,   18,   19,
 };
-static const short yycheck[] = {                         23,
-   51,   44,   44,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
-   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
-   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   52,
+static const short yycheck[] = {                         12,
+   23,   23,   23,    2,    3,    4,    5,   27,    0,   44,
+   48,   50,   49,   45,   34,    7,   29,   35,   51,   23,
+   30,   52,   40,    0,   50,   24,   47,   44,   44,   52,
+   52,   50,   44,    7,   47,   43,   -1,   52,   52,
 };
-#define YYFINAL 2
+#define YYFINAL 6
 #ifndef YYDEBUG
 #define YYDEBUG 1
 #endif
@@ -183,14 +210,44 @@ static const char *yyname[] = {
 };
 static const char *yyrule[] = {
 "$accept : Program",
-"Program : StmtBlock",
-"Exprq :",
-"Exprq : Expr",
-"Expr : T_Identifier",
-"Stmt : Exprq T_Semicolon",
-"Stmts :",
-"Stmts : Stmts Stmt",
-"StmtBlock : T_LBrace Stmts T_RBrace",
+"Program : Decls",
+"Decls : Decl",
+"Decls : Decls Decl",
+"Decl : VariableDecl",
+"Decl : FunctionDecl",
+"VariableDecl : Variable T_Semicolon",
+"Variable : Type Y_Identifier",
+"FunctionDecl : Type Y_Identifier T_LParen Formalsq T_RParen StmtBlock",
+"Formalsq :",
+"Formalsq : Formals",
+"Formals : Variable",
+"Formals : Formals T_Comma Variable",
+"StmtBlock : T_LBrace StmtVarsq Stmtsq T_RBrace",
+"StmtVarsq :",
+"StmtVarsq : StmtVars",
+"StmtVars : VariableDecl",
+"StmtVars : StmtVars VariableDecl",
+"Stmtsq :",
+"Stmtsq : Stmts",
+"Stmts : Stmt T_Semicolon",
+"Stmts : Stmts Stmt T_Semicolon",
+"Stmt : Y_Identifier Y_Minus Y_Identifier",
+"Type : Primtype",
+"Type : Usertype",
+"Type : Lsttype",
+"Primtype : Y_Int",
+"Primtype : Y_Double",
+"Primtype : Y_Bool",
+"Primtype : Y_String",
+"Usertype : Y_TypeIdentifier",
+"Lsttype : Type T_LBracket T_RBracket",
+"Y_Int : T_Int",
+"Y_Double : T_Double",
+"Y_Bool : T_Bool",
+"Y_String : T_String",
+"Y_TypeIdentifier : T_TypeIdentifier",
+"Y_Identifier : T_Identifier",
+"Y_Minus : T_Minus",
 
 };
 #endif
@@ -228,14 +285,14 @@ typedef struct {
 } YYSTACKDATA;
 /* variables for the parser stack */
 static YYSTACKDATA yystack;
-#line 119 "decaf.y"
+#line 137 "decaf.y"
 
 int yyerror(const char * s)
 {
   fprintf(stderr, "%s\n", s);
   return 0;
 }
-#line 238 "y.tab.c"
+#line 295 "y.tab.c"
 
 #if YYDEBUG
 #include <stdio.h>		/* needed for printf */
@@ -441,36 +498,107 @@ yyreduce:
         memset(&yyval, 0, sizeof yyval);
     switch (yyn)
     {
-case 1:
-#line 87 "decaf.y"
-	{ top = yyval = yystack.l_mark[0]; }
-break;
 case 2:
 #line 89 "decaf.y"
-	{ yyval = nullptr; }
+	{ yyval = new ParseTree("program", yystack.l_mark[0]); top = yyval; }
 break;
-case 4:
-#line 91 "decaf.y"
-	{ yyval = new ParseTree("IDENTIFIER"); }
-break;
-case 5:
-#line 93 "decaf.y"
-	{ yyval = yystack.l_mark[-1] ? yystack.l_mark[-1] : new ParseTree("NULLSTMT"); }
-break;
-case 6:
-#line 94 "decaf.y"
-	{ yyval = new ParseTree("STATEMENTS"); }
+case 3:
+#line 90 "decaf.y"
+	{ yystack.l_mark[-1]->addChild(yystack.l_mark[0]); }
 break;
 case 7:
 #line 95 "decaf.y"
-	{ yystack.l_mark[-1]->addChild(yystack.l_mark[0]);
-                   yyval = yystack.l_mark[-1]; }
+	{ yyval = new ParseTree("variable", yystack.l_mark[-1], yystack.l_mark[0]); }
 break;
 case 8:
-#line 97 "decaf.y"
-	{ yyval = new ParseTree("STATEMENTBLOCK", yystack.l_mark[-1]); }
+#line 98 "decaf.y"
+	{ yyval = new ParseTree("functiondecl", yystack.l_mark[-5], yystack.l_mark[-4], yystack.l_mark[-2], yystack.l_mark[0]); }
 break;
-#line 473 "y.tab.c"
+case 9:
+#line 99 "decaf.y"
+	{ yyval = new ParseTree("formals"); }
+break;
+case 11:
+#line 101 "decaf.y"
+	{ yyval = new ParseTree("formals", yystack.l_mark[0]); }
+break;
+case 12:
+#line 102 "decaf.y"
+	{ yystack.l_mark[-2]->addChild(yystack.l_mark[0]); }
+break;
+case 13:
+#line 105 "decaf.y"
+	{ yyval = new ParseTree("stmtblock", yystack.l_mark[-2], yystack.l_mark[-1]); }
+break;
+case 14:
+#line 106 "decaf.y"
+	{ yyval = new ParseTree("vardecls"); }
+break;
+case 16:
+#line 108 "decaf.y"
+	{ yyval = new ParseTree("vardecls", yystack.l_mark[0]); }
+break;
+case 17:
+#line 109 "decaf.y"
+	{ yystack.l_mark[-1]->addChild(yystack.l_mark[0]); }
+break;
+case 18:
+#line 110 "decaf.y"
+	{ yyval = new ParseTree("stmts"); }
+break;
+case 20:
+#line 112 "decaf.y"
+	{ yyval = new ParseTree("stmts", yystack.l_mark[-1]); }
+break;
+case 21:
+#line 113 "decaf.y"
+	{ yystack.l_mark[-2]->addChild(yystack.l_mark[-1]); }
+break;
+case 22:
+#line 114 "decaf.y"
+	{ yyval = new ParseTree("binopstmt", yystack.l_mark[-2], yystack.l_mark[-1], yystack.l_mark[0]); }
+break;
+case 23:
+#line 117 "decaf.y"
+	{ yyval = new ParseTree("primtype", yystack.l_mark[0]); }
+break;
+case 24:
+#line 118 "decaf.y"
+	{ yyval = new ParseTree("usertype", yystack.l_mark[0]); }
+break;
+case 25:
+#line 119 "decaf.y"
+	{ yyval = new ParseTree("arraytype", yystack.l_mark[0]); }
+break;
+case 32:
+#line 126 "decaf.y"
+	{ yyval = new ParseTree(myTok); }
+break;
+case 33:
+#line 127 "decaf.y"
+	{ yyval = new ParseTree(myTok); }
+break;
+case 34:
+#line 128 "decaf.y"
+	{ yyval = new ParseTree(myTok); }
+break;
+case 35:
+#line 129 "decaf.y"
+	{ yyval = new ParseTree(myTok); }
+break;
+case 36:
+#line 130 "decaf.y"
+	{ yyval = new ParseTree(myTok); }
+break;
+case 37:
+#line 131 "decaf.y"
+	{ yyval = new ParseTree(myTok); }
+break;
+case 38:
+#line 134 "decaf.y"
+	{ yyval = new ParseTree(myTok); }
+break;
+#line 601 "y.tab.c"
     }
     yystack.s_mark -= yym;
     yystate = *yystack.s_mark;

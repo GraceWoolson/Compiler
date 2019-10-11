@@ -1,0 +1,28 @@
+Program: StmtBlock { top = $$ = $1; }
+
+Exprq: { $$ = nullptr; }
+    | Expr
+Expr: T_Identifier { $$ = new ParseTree("IDENTIFIER"); }
+
+Stmt: Exprq T_Semicolon { $$ = $1 ? $1 : new ParseTree("NULLSTMT"); }
+Stmts: { $$ = new ParseTree("STATEMENTS"); }
+    | Stmts Stmt { $1->addChild($2);
+                   $$ = $1; }
+StmtBlock: T_LBrace Stmts T_RBrace { $$ = new ParseTree("STATEMENTBLOCK", $2); }
+
+/* S: Expr { top = $$ = $1; }
+Expr: Expr Op1 Term { $$ = new ParseTree("BINOP", $1, $2, $3); }
+   |  Term            { $$ = $1; }
+
+Term: Term Op2 Factor { $$ = new ParseTree("BINOP", $1, $2, $3); }
+   |  Factor          { $$ = $1; }
+
+Factor:  Y_Identifier           { $$ = $1; }
+    |    T_LParen Expr T_RParen { $$ = $2; }
+
+Op1: T_Plus { $$ = new ParseTree(myTok); }
+  |  T_Minus { $$ = new ParseTree(myTok); }
+
+
+Op2: T_Times { $$ = new ParseTree(myTok); }
+  |  T_Div { $$ = new ParseTree(myTok); }

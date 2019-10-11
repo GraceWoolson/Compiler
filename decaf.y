@@ -83,37 +83,66 @@ using namespace std;
  %}
 
 %%
+ /* to see about shift reduce errors? https://stackoverflow.com/questions/30447829/rules-are-never-reduced-understanding-why */
+Program: Decls
 
-Program: StmtBlock { top = $$ = $1; }
+Decls: Decl { $$ = new ParseTree("program", $1); top = $$; }
+    | Decls Decl { $1->addChild($2); }
+Decl: VariableDecl | FunctionDecl
 
-Exprq: { $$ = nullptr; }
+  /* variable declarations */
+VariableDecl: Variable T_Semicolon
+Variable: Type Y_Identifier { $$ = new ParseTree("variable", $1, $2); }
+
+  /* function declarations */
+FunctionDecl: Type Y_Identifier T_LParen Formalsq T_RParen StmtBlock { $$ = new ParseTree("functiondecl", $1, $2, $4, $6); }
+Formalsq: { $$ = new ParseTree("formals"); }
+    | Formals
+Formals: Variable { $$ = new ParseTree("formals", $1); }
+    | Formals T_Comma Variable { $1->addChild($3); }
+
+  /* Statements and Statement Blocks */
+StmtBlock: T_LBrace StmtVarsq Stmtsq T_RBrace { $$ = new ParseTree("stmtblock", $2, $3); }
+StmtVarsq: { $$ = new ParseTree("vardecls"); }
+    | StmtVars
+StmtVars: VariableDecl { $$ = new ParseTree("vardecls", $1); }
+    | StmtVars VariableDecl { $1->addChild($2); }
+Stmtsq: { $$ = new ParseTree("stmts"); }
+    | Stmts
+Stmts: Stmt T_Semicolon { $$ = new ParseTree("stmts", $1); }
+    | Stmts Stmt T_Semicolon { $1->addChild($2); }
+Stmt: Exprq T_Semicolon
+
+  /* Expressions! */
+Exprq: { $$ = new ParseTree("nullstmt"); }
     | Expr
-Expr: T_Identifier { $$ = new ParseTree("IDENTIFIER"); }
+Expr: Constants
 
-Stmt: Exprq T_Semicolon { $$ = $1 ? $1 : new ParseTree("NULLSTMT"); }
-Stmts: { $$ = new ParseTree("STATEMENTS"); }
-    | Stmts Stmt { $1->addChild($2);
-                   $$ = $1; }
-StmtBlock: T_LBrace Stmts T_RBrace { $$ = new ParseTree("STATEMENTBLOCK", $2); }
+Constants: Y_IntConstant | Y_DoubleConstant | Y_BoolConstant | Y_StringConstant
 
-/* S: Expr { top = $$ = $1; }
-Expr: Expr Op1 Term { $$ = new ParseTree("BINOP", $1, $2, $3); }
-   |  Term            { $$ = $1; }
+  /* types! */
+Type: Primtype { $$ = new ParseTree("primtype", $1); }
+    | Usertype { $$ = new ParseTree("usertype", $1); }
+    | Lsttype { $$ = new ParseTree("arraytype", $1); }
 
-Term: Term Op2 Factor { $$ = new ParseTree("BINOP", $1, $2, $3); }
-   |  Factor          { $$ = $1; }
+Primtype: Y_Int | Y_Double | Y_Bool | Y_String
+Usertype: Y_TypeIdentifier
+Lsttype: Type T_LBracket T_RBracket
 
-Factor:  Y_Identifier           { $$ = $1; }
-    |    T_LParen Expr T_RParen { $$ = $2; }
+  /* terminals */
+Y_IntConstant: T_IntConstant { $$ = new ParseTree(myTok); }
+Y_DoubleConstant: T_DoubleConstant { $$ = new ParseTree(myTok); }
+Y_BoolConstant: T_BoolConstant { $$ = new ParseTree(myTok); }
+Y_StringConstant: T_StringConstant { $$ = new ParseTree(myTok); }
+Y_Int: T_Int { $$ = new ParseTree(myTok); }
+Y_Double: T_Double { $$ = new ParseTree(myTok); }
+Y_Bool: T_Bool { $$ = new ParseTree(myTok); }
+Y_String: T_String { $$ = new ParseTree(myTok); }
+Y_TypeIdentifier: T_TypeIdentifier { $$ = new ParseTree(myTok); }
+Y_Identifier: T_Identifier { $$ = new ParseTree(myTok); }
 
-Op1: T_Plus { $$ = new ParseTree(myTok); }
-  |  T_Minus { $$ = new ParseTree(myTok); }
-
-
-Op2: T_Times { $$ = new ParseTree(myTok); }
-  |  T_Div { $$ = new ParseTree(myTok); }
-
-Y_Identifier: T_Identifier { $$ = new ParseTree(myTok); } */
+  /* operators */
+Y_Minus: T_Minus { $$ = new ParseTree(myTok); }
 
 %%
 
