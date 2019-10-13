@@ -140,14 +140,28 @@ Expr7: Expr7 Y_Times Expr8 { $$ = new ParseTree("binop", $1, $2, $3); }
 Expr8: Y_Not Expr9 { $$ = new ParseTree("uop", $1, $2); }
     | Y_Minus Expr9 { $$ = new ParseTree("uop", $1, $2); }
     | Expr9
-Expr9: NoOp
+Expr9: Constant | LValue | Y_This | Call
+    | T_LParen Expr T_RParen { $$ = $2; }
+    | T_ReadInteger T_LParen T_RParen { $$ = new ParseTree("readinteger"); }
+    | T_ReadLine T_LParen T_RParen { $$ = new ParseTree("readline"); }
+    | T_New T_LParen Y_Identifier T_RParen { $$ = new ParseTree("new", $3); }
+    | T_NewArray T_LParen Expr T_Comma NewArrayType T_RParen { $$ = new ParseTree("newarray", $3, $5); }
 
-NoOp: Constant
+LValue: Y_Identifier | FieldAccess | ArrayRef
+FieldAccess: Expr9 T_Dot Y_Identifier { $$ = new ParseTree("field_access", $1, $3); }
+ArrayRef: Expr9 T_LBracket Expr T_RBracket { $$ = new ParseTree("aref", $1, $3); }
+Call: Y_Identifier T_LParen Actualsq T_RParen { $$ = new ParseTree("call", $1, $3); }
+    | FieldAccess T_LParen Actualsq T_RParen { $$ = new ParseTree("call", $1, $3); }
+Actualsq: { $$ = new ParseTree("actuals"); }
+    | Actuals
+Actuals: Expr { $$ = new ParseTree("actuals", $1); }
+    | Actuals T_Comma Expr { $1->addChild($3); }
 
-LValue: Y_Identifier
+  /* No Ops */
 Constant: Y_IntConstant | Y_DoubleConstant | Y_BoolConstant | Y_StringConstant
 
   /* types! */
+NewArrayType: Type | Y_Identifier { $$ = new ParseTree("usertype", $1); }
 Type: Primtype { $$ = new ParseTree("primtype", $1); }
     | Usertype { $$ = new ParseTree("usertype", $1); }
     | Lsttype { $$ = new ParseTree("arraytype", $1); }
@@ -167,6 +181,7 @@ Y_Bool: T_Bool { $$ = new ParseTree(myTok); }
 Y_String: T_String { $$ = new ParseTree(myTok); }
 Y_TypeIdentifier: T_TypeIdentifier { $$ = new ParseTree(myTok); }
 Y_Identifier: T_Identifier { $$ = new ParseTree(myTok); }
+Y_This: T_This { $$ = new ParseTree(myTok); }
 
   /* operators */
 Y_Assign: T_Assign { $$ = new ParseTree(myTok); }

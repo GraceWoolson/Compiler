@@ -1,1 +1,1 @@
-{}
+int myfunc (int a) {string words; NewArray(a || b && c, int); }
