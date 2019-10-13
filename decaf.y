@@ -116,9 +116,14 @@ Stmt: Exprq T_Semicolon
   /* Expressions! */
 Exprq: { $$ = new ParseTree("nullstmt"); }
     | Expr
-Expr: Constants
+Expr: LValue Y_Assign Expr { $$ = new ParseTree("binop", $1, $2, $3); }
+    | Expr2
+Expr2: Expr3 Y_Or Expr2
 
-Constants: Y_IntConstant | Y_DoubleConstant | Y_BoolConstant | Y_StringConstant
+Expr3: Constant
+
+LValue: Y_Identifier
+Constant: Y_IntConstant | Y_DoubleConstant | Y_BoolConstant | Y_StringConstant
 
   /* types! */
 Type: Primtype { $$ = new ParseTree("primtype", $1); }
@@ -142,7 +147,21 @@ Y_TypeIdentifier: T_TypeIdentifier { $$ = new ParseTree(myTok); }
 Y_Identifier: T_Identifier { $$ = new ParseTree(myTok); }
 
   /* operators */
+Y_Assign: T_Assign { $$ = new ParseTree(myTok); }
+Y_Or: T_Or { $$ = new ParseTree(myTok); }
+Y_Plus: T_Plus { $$ = new ParseTree(myTok); }
 Y_Minus: T_Minus { $$ = new ParseTree(myTok); }
+Y_Times: T_Times { $$ = new ParseTree(myTok); }
+Y_Div: T_Div { $$ = new ParseTree(myTok); }
+Y_Mod: T_Mod { $$ = new ParseTree(myTok); }
+Y_Less: T_Less { $$ = new ParseTree(myTok); }
+Y_LessEqual: T_LessEqual { $$ = new ParseTree(myTok); }
+Y_Greater: T_Greater { $$ = new ParseTree(myTok); }
+Y_GreaterEqual: T_GreaterEqual { $$ = new ParseTree(myTok); }
+Y_Equal: T_Equal { $$ = new ParseTree(myTok); }
+Y_NotEqual: T_NotEqual { $$ = new ParseTree(myTok); }
+Y_And: T_And { $$ = new ParseTree(myTok); }
+Y_Not: T_Not { $$ = new ParseTree(myTok); }
 
 %%
 
