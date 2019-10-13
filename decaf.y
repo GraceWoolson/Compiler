@@ -96,12 +96,13 @@ Variable: Type Y_Identifier { $$ = new ParseTree("variable", $1, $2); }
 
   /* function declarations */
 FunctionDecl: Type Y_Identifier T_LParen Formalsq T_RParen StmtBlock { $$ = new ParseTree("functiondecl", $1, $2, $4, $6); }
+    | Y_Void Y_Identifier T_LParen Formalsq T_RParen StmtBlock { $$ = new ParseTree("functiondecl", $1, $2, $4, $6); }
 Formalsq: { $$ = new ParseTree("formals"); }
     | Formals
 Formals: Variable { $$ = new ParseTree("formals", $1); }
     | Formals T_Comma Variable { $1->addChild($3); }
 
-  /* Statements and Statement Blocks */
+  /* Statement Blocks */
 StmtBlock: T_LBrace StmtVarsq Stmtsq T_RBrace { $$ = new ParseTree("stmtblock", $2, $3); }
 StmtVarsq: { $$ = new ParseTree("vardecls"); }
     | StmtVars
@@ -111,9 +112,31 @@ Stmtsq: { $$ = new ParseTree("stmts"); }
     | Stmts
 Stmts: Stmt { $$ = new ParseTree("stmts", $1); }
     | Stmts Stmt { $1->addChild($2); }
-Stmt: Exprq T_Semicolon
+  /* no PrintStmt necessary because it is invoked as a call?? */
+Stmt: Exprq T_Semicolon | StmtBlock | IfStmt | WhileStmt | ForStmt | BreakStmt
+    | ReturnStmt | PrintStmt
 
-  /* Expressions!  SHOULD GO BACK AND TEST MORE */
+  /* Statements */
+IfStmt: MatchedIf | OpenIf
+MatchedIf: T_If Expr StmtBlock T_Else StmtBlock { $$ = new ParseTree("if", $2, $3, $5); }
+OpenIf: T_If Expr StmtBlock { $$ = new ParseTree("if", $2, $3); }
+
+WhileStmt: T_While T_LParen Expr T_RParen Stmt { $$ = new ParseTree("while", $3, $5); }
+
+  /* inconsistent output (NULL instead of nullstmt) */
+ForStmt: T_For T_LParen ForExprq T_Semicolon Expr T_Semicolon ForExprq T_RParen Stmt { $$ = new ParseTree("for", $3, $5, $7, $9); }
+ForExprq:
+    | Expr
+
+  /* inconsistent output */
+BreakStmt: Y_Break T_Semicolon { $$ = new ParseTree("break", $1); }
+  /* inconsistent output */
+ReturnStmt: Y_Return T_Semicolon { $$ = new ParseTree("return", $1); }
+    | Y_Return Expr T_Semicolon { $$ = new ParseTree("return", $1, $2); }
+
+PrintStmt: Y_Print T_LParen Actuals T_RParen T_Semicolon { $$ = new ParseTree("print", $1, $3); }
+
+  /* Expressions! */
 Exprq: { $$ = new ParseTree("nullstmt"); }
     | Expr
 Expr: LValue Y_Assign Expr { $$ = new ParseTree("binop", $1, $2, $3); }
@@ -140,6 +163,7 @@ Expr7: Expr7 Y_Times Expr8 { $$ = new ParseTree("binop", $1, $2, $3); }
 Expr8: Y_Not Expr9 { $$ = new ParseTree("uop", $1, $2); }
     | Y_Minus Expr9 { $$ = new ParseTree("uop", $1, $2); }
     | Expr9
+  /* inconsistent output on readinteger and readline */
 Expr9: Constant | LValue | Y_This | Call
     | T_LParen Expr T_RParen { $$ = $2; }
     | T_ReadInteger T_LParen T_RParen { $$ = new ParseTree("readinteger"); }
@@ -147,6 +171,8 @@ Expr9: Constant | LValue | Y_This | Call
     | T_New T_LParen Y_Identifier T_RParen { $$ = new ParseTree("new", $3); }
     | T_NewArray T_LParen Expr T_Comma NewArrayType T_RParen { $$ = new ParseTree("newarray", $3, $5); }
 
+  /* No Ops */
+Constant: Y_IntConstant | Y_DoubleConstant | Y_BoolConstant | Y_StringConstant | Y_Null
 LValue: Y_Identifier | FieldAccess | ArrayRef
 FieldAccess: Expr9 T_Dot Y_Identifier { $$ = new ParseTree("field_access", $1, $3); }
 ArrayRef: Expr9 T_LBracket Expr T_RBracket { $$ = new ParseTree("aref", $1, $3); }
@@ -156,9 +182,6 @@ Actualsq: { $$ = new ParseTree("actuals"); }
     | Actuals
 Actuals: Expr { $$ = new ParseTree("actuals", $1); }
     | Actuals T_Comma Expr { $1->addChild($3); }
-
-  /* No Ops */
-Constant: Y_IntConstant | Y_DoubleConstant | Y_BoolConstant | Y_StringConstant
 
   /* types! */
 NewArrayType: Type | Y_Identifier { $$ = new ParseTree("usertype", $1); }
@@ -182,6 +205,11 @@ Y_String: T_String { $$ = new ParseTree(myTok); }
 Y_TypeIdentifier: T_TypeIdentifier { $$ = new ParseTree(myTok); }
 Y_Identifier: T_Identifier { $$ = new ParseTree(myTok); }
 Y_This: T_This { $$ = new ParseTree(myTok); }
+Y_Null: T_Null { $$ = new ParseTree(myTok); }
+Y_Break: T_Break { $$ = new ParseTree(myTok); }
+Y_Return: T_Return { $$ = new ParseTree(myTok); }
+Y_Print: T_Print { $$ = new ParseTree(myTok); }
+Y_Void: T_Void { $$ = new ParseTree(myTok); }
 
   /* operators */
 Y_Assign: T_Assign { $$ = new ParseTree(myTok); }
