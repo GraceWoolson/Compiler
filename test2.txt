@@ -1,1 +1,1 @@
-int myfunc (int a) {string words; 3;}
+int myfunc (int a) {string words; a = 3;}

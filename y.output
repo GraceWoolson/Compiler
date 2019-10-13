@@ -31,37 +31,55 @@
   18  Stmtsq :
   19         | Stmts
 
-  20  Stmts : Stmt T_Semicolon
-  21        | Stmts Stmt T_Semicolon
+  20  Stmts : Stmt
+  21        | Stmts Stmt
 
-  22  Stmt : Y_Identifier Y_Minus Y_Identifier
+  22  Stmt : Exprq T_Semicolon
 
-  23  Type : Primtype
-  24       | Usertype
-  25       | Lsttype
+  23  Exprq :
+  24        | Expr
 
-  26  Primtype : Y_Int
-  27           | Y_Double
-  28           | Y_Bool
-  29           | Y_String
+  25  Expr : Constants
 
-  30  Usertype : Y_TypeIdentifier
+  26  Constants : Y_IntConstant
+  27            | Y_DoubleConstant
+  28            | Y_BoolConstant
+  29            | Y_StringConstant
 
-  31  Lsttype : Type T_LBracket T_RBracket
+  30  Type : Primtype
+  31       | Usertype
+  32       | Lsttype
 
-  32  Y_Int : T_Int
+  33  Primtype : Y_Int
+  34           | Y_Double
+  35           | Y_Bool
+  36           | Y_String
 
-  33  Y_Double : T_Double
+  37  Usertype : Y_TypeIdentifier
 
-  34  Y_Bool : T_Bool
+  38  Lsttype : Type T_LBracket T_RBracket
 
-  35  Y_String : T_String
+  39  Y_IntConstant : T_IntConstant
 
-  36  Y_TypeIdentifier : T_TypeIdentifier
+  40  Y_DoubleConstant : T_DoubleConstant
 
-  37  Y_Identifier : T_Identifier
+  41  Y_BoolConstant : T_BoolConstant
 
-  38  Y_Minus : T_Minus
+  42  Y_StringConstant : T_StringConstant
+
+  43  Y_Int : T_Int
+
+  44  Y_Double : T_Double
+
+  45  Y_Bool : T_Bool
+
+  46  Y_String : T_String
+
+  47  Y_TypeIdentifier : T_TypeIdentifier
+
+  48  Y_Identifier : T_Identifier
+
+  49  Y_Minus : T_Minus
 
 state 0
 	$accept : . Program $end  (0)
@@ -91,33 +109,33 @@ state 0
 
 
 state 1
-	Y_Int : T_Int .  (32)
+	Y_Int : T_Int .  (43)
 
-	.  reduce 32
+	.  reduce 43
 
 
 state 2
-	Y_Double : T_Double .  (33)
+	Y_Double : T_Double .  (44)
 
-	.  reduce 33
+	.  reduce 44
 
 
 state 3
-	Y_Bool : T_Bool .  (34)
+	Y_Bool : T_Bool .  (45)
 
-	.  reduce 34
+	.  reduce 45
 
 
 state 4
-	Y_String : T_String .  (35)
+	Y_String : T_String .  (46)
 
-	.  reduce 35
+	.  reduce 46
 
 
 state 5
-	Y_TypeIdentifier : T_TypeIdentifier .  (36)
+	Y_TypeIdentifier : T_TypeIdentifier .  (47)
 
-	.  reduce 36
+	.  reduce 47
 
 
 state 6
@@ -180,7 +198,7 @@ state 11
 state 12
 	Variable : Type . Y_Identifier  (7)
 	FunctionDecl : Type . Y_Identifier T_LParen Formalsq T_RParen StmtBlock  (8)
-	Lsttype : Type . T_LBracket T_RBracket  (31)
+	Lsttype : Type . T_LBracket T_RBracket  (38)
 
 	T_Identifier  shift 23
 	T_LBracket  shift 24
@@ -190,51 +208,51 @@ state 12
 
 
 state 13
-	Type : Primtype .  (23)
+	Type : Primtype .  (30)
 
-	.  reduce 23
+	.  reduce 30
 
 
 state 14
-	Type : Usertype .  (24)
+	Type : Usertype .  (31)
 
-	.  reduce 24
+	.  reduce 31
 
 
 state 15
-	Type : Lsttype .  (25)
+	Type : Lsttype .  (32)
 
-	.  reduce 25
+	.  reduce 32
 
 
 state 16
-	Primtype : Y_Int .  (26)
+	Primtype : Y_Int .  (33)
 
-	.  reduce 26
+	.  reduce 33
 
 
 state 17
-	Primtype : Y_Double .  (27)
+	Primtype : Y_Double .  (34)
 
-	.  reduce 27
+	.  reduce 34
 
 
 state 18
-	Primtype : Y_Bool .  (28)
+	Primtype : Y_Bool .  (35)
 
-	.  reduce 28
+	.  reduce 35
 
 
 state 19
-	Primtype : Y_String .  (29)
+	Primtype : Y_String .  (36)
 
-	.  reduce 29
+	.  reduce 36
 
 
 state 20
-	Usertype : Y_TypeIdentifier .  (30)
+	Usertype : Y_TypeIdentifier .  (37)
 
-	.  reduce 30
+	.  reduce 37
 
 
 state 21
@@ -250,13 +268,13 @@ state 22
 
 
 state 23
-	Y_Identifier : T_Identifier .  (37)
+	Y_Identifier : T_Identifier .  (48)
 
-	.  reduce 37
+	.  reduce 48
 
 
 state 24
-	Lsttype : Type T_LBracket . T_RBracket  (31)
+	Lsttype : Type T_LBracket . T_RBracket  (38)
 
 	T_RBracket  shift 26
 	.  error
@@ -271,9 +289,9 @@ state 25
 
 
 state 26
-	Lsttype : Type T_LBracket T_RBracket .  (31)
+	Lsttype : Type T_LBracket T_RBracket .  (38)
 
-	.  reduce 31
+	.  reduce 38
 
 
 state 27
@@ -309,7 +327,7 @@ state 28
 
 state 29
 	Variable : Type . Y_Identifier  (7)
-	Lsttype : Type . T_LBracket T_RBracket  (31)
+	Lsttype : Type . T_LBracket T_RBracket  (38)
 
 	T_Identifier  shift 23
 	T_LBracket  shift 24
@@ -379,7 +397,11 @@ state 35
 	T_Bool  shift 3
 	T_String  shift 4
 	T_TypeIdentifier  shift 5
-	T_Identifier  reduce 14
+	T_IntConstant  reduce 14
+	T_BoolConstant  reduce 14
+	T_DoubleConstant  reduce 14
+	T_StringConstant  reduce 14
+	T_Semicolon  reduce 14
 	T_RBrace  reduce 14
 
 	VariableDecl  goto 38
@@ -418,14 +440,25 @@ state 38
 state 39
 	StmtBlock : T_LBrace StmtVarsq . Stmtsq T_RBrace  (13)
 	Stmtsq : .  (18)
+	Exprq : .  (23)
 
-	T_Identifier  shift 23
+	T_IntConstant  shift 41
+	T_BoolConstant  shift 42
+	T_DoubleConstant  shift 43
+	T_StringConstant  shift 44
+	T_Semicolon  reduce 23
 	T_RBrace  reduce 18
 
-	Y_Identifier  goto 41
-	Stmtsq  goto 42
-	Stmts  goto 43
-	Stmt  goto 44
+	Stmtsq  goto 45
+	Stmts  goto 46
+	Stmt  goto 47
+	Exprq  goto 48
+	Expr  goto 49
+	Constants  goto 50
+	Y_IntConstant  goto 51
+	Y_DoubleConstant  goto 52
+	Y_BoolConstant  goto 53
+	Y_StringConstant  goto 54
 
 
 state 40
@@ -437,10 +470,14 @@ state 40
 	T_Bool  shift 3
 	T_String  shift 4
 	T_TypeIdentifier  shift 5
-	T_Identifier  reduce 15
+	T_IntConstant  reduce 15
+	T_BoolConstant  reduce 15
+	T_DoubleConstant  reduce 15
+	T_StringConstant  reduce 15
+	T_Semicolon  reduce 15
 	T_RBrace  reduce 15
 
-	VariableDecl  goto 45
+	VariableDecl  goto 55
 	Variable  goto 11
 	Type  goto 29
 	Primtype  goto 13
@@ -454,90 +491,134 @@ state 40
 
 
 state 41
-	Stmt : Y_Identifier . Y_Minus Y_Identifier  (22)
+	Y_IntConstant : T_IntConstant .  (39)
 
-	T_Minus  shift 46
-	.  error
-
-	Y_Minus  goto 47
+	.  reduce 39
 
 
 state 42
-	StmtBlock : T_LBrace StmtVarsq Stmtsq . T_RBrace  (13)
+	Y_BoolConstant : T_BoolConstant .  (41)
 
-	T_RBrace  shift 48
-	.  error
+	.  reduce 41
 
 
 state 43
-	Stmtsq : Stmts .  (19)
-	Stmts : Stmts . Stmt T_Semicolon  (21)
+	Y_DoubleConstant : T_DoubleConstant .  (40)
 
-	T_Identifier  shift 23
-	T_RBrace  reduce 19
-
-	Y_Identifier  goto 41
-	Stmt  goto 49
+	.  reduce 40
 
 
 state 44
-	Stmts : Stmt . T_Semicolon  (20)
+	Y_StringConstant : T_StringConstant .  (42)
 
-	T_Semicolon  shift 50
-	.  error
+	.  reduce 42
 
 
 state 45
+	StmtBlock : T_LBrace StmtVarsq Stmtsq . T_RBrace  (13)
+
+	T_RBrace  shift 56
+	.  error
+
+
+state 46
+	Stmtsq : Stmts .  (19)
+	Stmts : Stmts . Stmt  (21)
+	Exprq : .  (23)
+
+	T_IntConstant  shift 41
+	T_BoolConstant  shift 42
+	T_DoubleConstant  shift 43
+	T_StringConstant  shift 44
+	T_Semicolon  reduce 23
+	T_RBrace  reduce 19
+
+	Stmt  goto 57
+	Exprq  goto 48
+	Expr  goto 49
+	Constants  goto 50
+	Y_IntConstant  goto 51
+	Y_DoubleConstant  goto 52
+	Y_BoolConstant  goto 53
+	Y_StringConstant  goto 54
+
+
+state 47
+	Stmts : Stmt .  (20)
+
+	.  reduce 20
+
+
+state 48
+	Stmt : Exprq . T_Semicolon  (22)
+
+	T_Semicolon  shift 58
+	.  error
+
+
+state 49
+	Exprq : Expr .  (24)
+
+	.  reduce 24
+
+
+state 50
+	Expr : Constants .  (25)
+
+	.  reduce 25
+
+
+state 51
+	Constants : Y_IntConstant .  (26)
+
+	.  reduce 26
+
+
+state 52
+	Constants : Y_DoubleConstant .  (27)
+
+	.  reduce 27
+
+
+state 53
+	Constants : Y_BoolConstant .  (28)
+
+	.  reduce 28
+
+
+state 54
+	Constants : Y_StringConstant .  (29)
+
+	.  reduce 29
+
+
+state 55
 	StmtVars : StmtVars VariableDecl .  (17)
 
 	.  reduce 17
 
 
-state 46
-	Y_Minus : T_Minus .  (38)
-
-	.  reduce 38
-
-
-state 47
-	Stmt : Y_Identifier Y_Minus . Y_Identifier  (22)
-
-	T_Identifier  shift 23
-	.  error
-
-	Y_Identifier  goto 51
-
-
-state 48
+state 56
 	StmtBlock : T_LBrace StmtVarsq Stmtsq T_RBrace .  (13)
 
 	.  reduce 13
 
 
-state 49
-	Stmts : Stmts Stmt . T_Semicolon  (21)
-
-	T_Semicolon  shift 52
-	.  error
-
-
-state 50
-	Stmts : Stmt T_Semicolon .  (20)
-
-	.  reduce 20
-
-
-state 51
-	Stmt : Y_Identifier Y_Minus Y_Identifier .  (22)
-
-	.  reduce 22
-
-
-state 52
-	Stmts : Stmts Stmt T_Semicolon .  (21)
+state 57
+	Stmts : Stmts Stmt .  (21)
 
 	.  reduce 21
 
 
-54 terminals, 26 nonterminals
-39 grammar rules, 53 states
+state 58
+	Stmt : Exprq T_Semicolon .  (22)
+
+	.  reduce 22
+
+
+Rules never reduced:
+	Y_Minus : T_Minus  (49)
+
+
+54 terminals, 33 nonterminals
+50 grammar rules, 59 states

@@ -109,8 +109,8 @@ StmtVars: VariableDecl { $$ = new ParseTree("vardecls", $1); }
     | StmtVars VariableDecl { $1->addChild($2); }
 Stmtsq: { $$ = new ParseTree("stmts"); }
     | Stmts
-Stmts: Stmt T_Semicolon { $$ = new ParseTree("stmts", $1); }
-    | Stmts Stmt T_Semicolon { $1->addChild($2); }
+Stmts: Stmt { $$ = new ParseTree("stmts", $1); }
+    | Stmts Stmt { $1->addChild($2); }
 Stmt: Exprq T_Semicolon
 
   /* Expressions! */
