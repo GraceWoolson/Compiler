@@ -1,0 +1,5 @@
+interface wow {
+    int wow (int a, string b);
+    void hello ();
+    string world();
+}

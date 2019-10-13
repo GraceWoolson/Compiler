@@ -1,3 +1,7 @@
-void myfunc (int a) {
-    Print(a = b, "wow");
+class a extends b implements c, d, e {
+    int b;
+    void hi(){
+        Print("hi");
+    }
+    string d;
 }

@@ -88,7 +88,32 @@ Program: Decls
 
 Decls: Decl { $$ = new ParseTree("program", $1); top = $$; }
     | Decls Decl { $1->addChild($2); }
-Decl: VariableDecl | FunctionDecl
+Decl: VariableDecl | FunctionDecl | ClassDecl | InterfaceDecl
+
+  /* interface declarations INCONSISTENT WITH OTHER * */
+InterfaceDecl: T_Interface Y_Identifier T_LBrace T_RBrace { $$ = new ParseTree("interface", $2); }
+    | InterfaceDecl2
+InterfaceDecl2: T_Interface InterfaceMiddle T_RBrace { $$ = $2; }
+InterfaceMiddle: Y_Identifier T_LBrace Prototype { $$ = new ParseTree("interface", $1, $3); }
+    | InterfaceMiddle Prototype { $1 -> addChild($2); }
+
+Prototype: Type Y_Identifier T_LParen Formalsq T_RParen T_Semicolon { $$ = new ParseTree("prototype", $1, $2, $4); }
+    | Y_Void Y_Identifier T_LParen Formalsq T_RParen T_Semicolon { $$ = new ParseTree("prototype", $1, $2, $4); }
+
+  /* class declarations */
+ClassDecl: T_Class Y_Identifier Extendsq Implementsq T_LBrace Fieldsq T_RBrace { $$ = new ParseTree("class", $2, $3, $4, $6); }
+    | T_Class Y_TypeIdentifier Extendsq Implementsq T_LBrace Fieldsq T_RBrace { $$ = new ParseTree("class", $2, $3, $4, $6); }
+Extendsq:
+    | T_Extends Y_Identifier { $$ = new ParseTree("extends", $2); }
+    | T_Extends Y_TypeIdentifier { $$ = new ParseTree("extends", $2); }
+Implementsq:
+    | Implements
+Implements: T_Implements Y_Identifier { $$ = new ParseTree("implements", $2); }
+    | Implements T_Comma Y_Identifier { $1->addChild($3); }
+Fieldsq: { $$ = new ParseTree("fields"); }
+    | Fieldsq VariableDecl { $1 -> addChild($2); }
+    | Fieldsq FunctionDecl { $1 -> addChild($2); }
+
 
   /* variable declarations */
 VariableDecl: Variable T_Semicolon
