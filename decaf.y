@@ -113,14 +113,36 @@ Stmts: Stmt { $$ = new ParseTree("stmts", $1); }
     | Stmts Stmt { $1->addChild($2); }
 Stmt: Exprq T_Semicolon
 
-  /* Expressions! */
+  /* Expressions!  SHOULD GO BACK AND TEST MORE */
 Exprq: { $$ = new ParseTree("nullstmt"); }
     | Expr
 Expr: LValue Y_Assign Expr { $$ = new ParseTree("binop", $1, $2, $3); }
     | Expr2
-Expr2: Expr3 Y_Or Expr2
+Expr2: Expr2 Y_Or Expr3 { $$ = new ParseTree("binop", $1, $2, $3); }
+    | Expr3
+Expr3: Expr3 Y_And Expr4 { $$ = new ParseTree("binop", $1, $2, $3); }
+    | Expr4
+Expr4: Expr4 Y_Equal Expr5 { $$ = new ParseTree("binop", $1, $2, $3); }
+    | Expr4 Y_NotEqual Expr5 { $$ = new ParseTree("binop", $1, $2, $3); }
+    | Expr5
+Expr5: Expr5 Y_Less Expr6 { $$ = new ParseTree("binop", $1, $2, $3); }
+    | Expr5 Y_LessEqual Expr6 { $$ = new ParseTree("binop", $1, $2, $3); }
+    | Expr5 Y_Greater Expr6 { $$ = new ParseTree("binop", $1, $2, $3); }
+    | Expr5 Y_GreaterEqual Expr6 { $$ = new ParseTree("binop", $1, $2, $3); }
+    | Expr6
+Expr6: Expr6 Y_Plus Expr7 { $$ = new ParseTree("binop", $1, $2, $3); }
+    | Expr6 Y_Minus Expr7 { $$ = new ParseTree("binop", $1, $2, $3); }
+    | Expr7
+Expr7: Expr7 Y_Times Expr8 { $$ = new ParseTree("binop", $1, $2, $3); }
+    | Expr7 Y_Div Expr8 { $$ = new ParseTree("binop", $1, $2, $3); }
+    | Expr7 Y_Mod Expr8 { $$ = new ParseTree("binop", $1, $2, $3); }
+    | Expr8
+Expr8: Y_Not Expr9 { $$ = new ParseTree("uop", $1, $2); }
+    | Y_Minus Expr9 { $$ = new ParseTree("uop", $1, $2); }
+    | Expr9
+Expr9: NoOp
 
-Expr3: Constant
+NoOp: Constant
 
 LValue: Y_Identifier
 Constant: Y_IntConstant | Y_DoubleConstant | Y_BoolConstant | Y_StringConstant

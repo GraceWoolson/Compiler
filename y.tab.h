@@ -50,4 +50,3 @@
 #define T_RParen 50
 #define T_LBrace 51
 #define T_RBrace 52
-#define Y_Or 257

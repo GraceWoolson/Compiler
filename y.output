@@ -42,53 +42,108 @@
   25  Expr : LValue Y_Assign Expr
   26       | Expr2
 
-  27  Expr2 : Expr3 Y_Or Expr2
+  27  Expr2 : Expr2 Y_Or Expr3
+  28        | Expr3
 
-  28  Expr3 : Constants
+  29  Expr3 : Expr3 Y_And Expr4
+  30        | Expr4
 
-  29  LValue : Y_Identifier
+  31  Expr4 : Expr4 Y_Equal Expr5
+  32        | Expr4 Y_NotEqual Expr5
+  33        | Expr5
 
-  30  Constants : Y_IntConstant
-  31            | Y_DoubleConstant
-  32            | Y_BoolConstant
-  33            | Y_StringConstant
+  34  Expr5 : Expr5 Y_Less Expr6
+  35        | Expr5 Y_LessEqual Expr6
+  36        | Expr5 Y_Greater Expr6
+  37        | Expr5 Y_GreaterEqual Expr6
+  38        | Expr6
 
-  34  Type : Primtype
-  35       | Usertype
-  36       | Lsttype
+  39  Expr6 : Expr6 Y_Plus Expr7
+  40        | Expr6 Y_Minus Expr7
+  41        | Expr7
 
-  37  Primtype : Y_Int
-  38           | Y_Double
-  39           | Y_Bool
-  40           | Y_String
+  42  Expr7 : Expr7 Y_Times Expr8
+  43        | Expr7 Y_Div Expr8
+  44        | Expr7 Y_Mod Expr8
+  45        | Expr8
 
-  41  Usertype : Y_TypeIdentifier
+  46  Expr8 : Y_Not Expr9
+  47        | Y_Minus Expr9
+  48        | Expr9
 
-  42  Lsttype : Type T_LBracket T_RBracket
+  49  Expr9 : NoOp
 
-  43  Y_IntConstant : T_IntConstant
+  50  NoOp : Constant
 
-  44  Y_DoubleConstant : T_DoubleConstant
+  51  LValue : Y_Identifier
 
-  45  Y_BoolConstant : T_BoolConstant
+  52  Constant : Y_IntConstant
+  53           | Y_DoubleConstant
+  54           | Y_BoolConstant
+  55           | Y_StringConstant
 
-  46  Y_StringConstant : T_StringConstant
+  56  Type : Primtype
+  57       | Usertype
+  58       | Lsttype
 
-  47  Y_Int : T_Int
+  59  Primtype : Y_Int
+  60           | Y_Double
+  61           | Y_Bool
+  62           | Y_String
 
-  48  Y_Double : T_Double
+  63  Usertype : Y_TypeIdentifier
 
-  49  Y_Bool : T_Bool
+  64  Lsttype : Type T_LBracket T_RBracket
 
-  50  Y_String : T_String
+  65  Y_IntConstant : T_IntConstant
 
-  51  Y_TypeIdentifier : T_TypeIdentifier
+  66  Y_DoubleConstant : T_DoubleConstant
 
-  52  Y_Identifier : T_Identifier
+  67  Y_BoolConstant : T_BoolConstant
 
-  53  Y_Minus : T_Minus
+  68  Y_StringConstant : T_StringConstant
 
-  54  Y_Assign : T_Assign
+  69  Y_Int : T_Int
+
+  70  Y_Double : T_Double
+
+  71  Y_Bool : T_Bool
+
+  72  Y_String : T_String
+
+  73  Y_TypeIdentifier : T_TypeIdentifier
+
+  74  Y_Identifier : T_Identifier
+
+  75  Y_Assign : T_Assign
+
+  76  Y_Or : T_Or
+
+  77  Y_Plus : T_Plus
+
+  78  Y_Minus : T_Minus
+
+  79  Y_Times : T_Times
+
+  80  Y_Div : T_Div
+
+  81  Y_Mod : T_Mod
+
+  82  Y_Less : T_Less
+
+  83  Y_LessEqual : T_LessEqual
+
+  84  Y_Greater : T_Greater
+
+  85  Y_GreaterEqual : T_GreaterEqual
+
+  86  Y_Equal : T_Equal
+
+  87  Y_NotEqual : T_NotEqual
+
+  88  Y_And : T_And
+
+  89  Y_Not : T_Not
 
 state 0
 	$accept : . Program $end  (0)
@@ -118,33 +173,33 @@ state 0
 
 
 state 1
-	Y_Int : T_Int .  (47)
+	Y_Int : T_Int .  (69)
 
-	.  reduce 47
+	.  reduce 69
 
 
 state 2
-	Y_Double : T_Double .  (48)
+	Y_Double : T_Double .  (70)
 
-	.  reduce 48
+	.  reduce 70
 
 
 state 3
-	Y_Bool : T_Bool .  (49)
+	Y_Bool : T_Bool .  (71)
 
-	.  reduce 49
+	.  reduce 71
 
 
 state 4
-	Y_String : T_String .  (50)
+	Y_String : T_String .  (72)
 
-	.  reduce 50
+	.  reduce 72
 
 
 state 5
-	Y_TypeIdentifier : T_TypeIdentifier .  (51)
+	Y_TypeIdentifier : T_TypeIdentifier .  (73)
 
-	.  reduce 51
+	.  reduce 73
 
 
 state 6
@@ -207,7 +262,7 @@ state 11
 state 12
 	Variable : Type . Y_Identifier  (7)
 	FunctionDecl : Type . Y_Identifier T_LParen Formalsq T_RParen StmtBlock  (8)
-	Lsttype : Type . T_LBracket T_RBracket  (42)
+	Lsttype : Type . T_LBracket T_RBracket  (64)
 
 	T_Identifier  shift 23
 	T_LBracket  shift 24
@@ -217,51 +272,51 @@ state 12
 
 
 state 13
-	Type : Primtype .  (34)
+	Type : Primtype .  (56)
 
-	.  reduce 34
+	.  reduce 56
 
 
 state 14
-	Type : Usertype .  (35)
+	Type : Usertype .  (57)
 
-	.  reduce 35
+	.  reduce 57
 
 
 state 15
-	Type : Lsttype .  (36)
+	Type : Lsttype .  (58)
 
-	.  reduce 36
+	.  reduce 58
 
 
 state 16
-	Primtype : Y_Int .  (37)
+	Primtype : Y_Int .  (59)
 
-	.  reduce 37
+	.  reduce 59
 
 
 state 17
-	Primtype : Y_Double .  (38)
+	Primtype : Y_Double .  (60)
 
-	.  reduce 38
+	.  reduce 60
 
 
 state 18
-	Primtype : Y_Bool .  (39)
+	Primtype : Y_Bool .  (61)
 
-	.  reduce 39
+	.  reduce 61
 
 
 state 19
-	Primtype : Y_String .  (40)
+	Primtype : Y_String .  (62)
 
-	.  reduce 40
+	.  reduce 62
 
 
 state 20
-	Usertype : Y_TypeIdentifier .  (41)
+	Usertype : Y_TypeIdentifier .  (63)
 
-	.  reduce 41
+	.  reduce 63
 
 
 state 21
@@ -277,13 +332,13 @@ state 22
 
 
 state 23
-	Y_Identifier : T_Identifier .  (52)
+	Y_Identifier : T_Identifier .  (74)
 
-	.  reduce 52
+	.  reduce 74
 
 
 state 24
-	Lsttype : Type T_LBracket . T_RBracket  (42)
+	Lsttype : Type T_LBracket . T_RBracket  (64)
 
 	T_RBracket  shift 26
 	.  error
@@ -298,9 +353,9 @@ state 25
 
 
 state 26
-	Lsttype : Type T_LBracket T_RBracket .  (42)
+	Lsttype : Type T_LBracket T_RBracket .  (64)
 
-	.  reduce 42
+	.  reduce 64
 
 
 state 27
@@ -336,7 +391,7 @@ state 28
 
 state 29
 	Variable : Type . Y_Identifier  (7)
-	Lsttype : Type . T_LBracket T_RBracket  (42)
+	Lsttype : Type . T_LBracket T_RBracket  (64)
 
 	T_Identifier  shift 23
 	T_LBracket  shift 24
@@ -411,6 +466,8 @@ state 35
 	T_BoolConstant  reduce 14
 	T_DoubleConstant  reduce 14
 	T_StringConstant  reduce 14
+	T_Minus  reduce 14
+	T_Not  reduce 14
 	T_Semicolon  reduce 14
 	T_RBrace  reduce 14
 
@@ -457,23 +514,34 @@ state 39
 	T_BoolConstant  shift 42
 	T_DoubleConstant  shift 43
 	T_StringConstant  shift 44
+	T_Minus  shift 45
+	T_Not  shift 46
 	T_Semicolon  reduce 23
 	T_RBrace  reduce 18
 
-	Y_Identifier  goto 45
-	Stmtsq  goto 46
-	Stmts  goto 47
-	Stmt  goto 48
-	Exprq  goto 49
-	Expr  goto 50
-	LValue  goto 51
-	Expr2  goto 52
-	Expr3  goto 53
-	Constants  goto 54
-	Y_IntConstant  goto 55
-	Y_DoubleConstant  goto 56
-	Y_BoolConstant  goto 57
-	Y_StringConstant  goto 58
+	Y_Identifier  goto 47
+	Stmtsq  goto 48
+	Stmts  goto 49
+	Stmt  goto 50
+	Exprq  goto 51
+	Expr  goto 52
+	LValue  goto 53
+	Expr2  goto 54
+	Expr3  goto 55
+	Expr4  goto 56
+	Expr5  goto 57
+	Expr6  goto 58
+	Expr7  goto 59
+	Y_Minus  goto 60
+	Expr8  goto 61
+	Y_Not  goto 62
+	Expr9  goto 63
+	NoOp  goto 64
+	Constant  goto 65
+	Y_IntConstant  goto 66
+	Y_DoubleConstant  goto 67
+	Y_BoolConstant  goto 68
+	Y_StringConstant  goto 69
 
 
 state 40
@@ -490,10 +558,12 @@ state 40
 	T_BoolConstant  reduce 15
 	T_DoubleConstant  reduce 15
 	T_StringConstant  reduce 15
+	T_Minus  reduce 15
+	T_Not  reduce 15
 	T_Semicolon  reduce 15
 	T_RBrace  reduce 15
 
-	VariableDecl  goto 59
+	VariableDecl  goto 70
 	Variable  goto 11
 	Type  goto 29
 	Primtype  goto 13
@@ -507,43 +577,55 @@ state 40
 
 
 state 41
-	Y_IntConstant : T_IntConstant .  (43)
+	Y_IntConstant : T_IntConstant .  (65)
 
-	.  reduce 43
+	.  reduce 65
 
 
 state 42
-	Y_BoolConstant : T_BoolConstant .  (45)
+	Y_BoolConstant : T_BoolConstant .  (67)
 
-	.  reduce 45
+	.  reduce 67
 
 
 state 43
-	Y_DoubleConstant : T_DoubleConstant .  (44)
+	Y_DoubleConstant : T_DoubleConstant .  (66)
 
-	.  reduce 44
+	.  reduce 66
 
 
 state 44
-	Y_StringConstant : T_StringConstant .  (46)
+	Y_StringConstant : T_StringConstant .  (68)
 
-	.  reduce 46
+	.  reduce 68
 
 
 state 45
-	LValue : Y_Identifier .  (29)
+	Y_Minus : T_Minus .  (78)
 
-	.  reduce 29
+	.  reduce 78
 
 
 state 46
-	StmtBlock : T_LBrace StmtVarsq Stmtsq . T_RBrace  (13)
+	Y_Not : T_Not .  (89)
 
-	T_RBrace  shift 60
-	.  error
+	.  reduce 89
 
 
 state 47
+	LValue : Y_Identifier .  (51)
+
+	.  reduce 51
+
+
+state 48
+	StmtBlock : T_LBrace StmtVarsq Stmtsq . T_RBrace  (13)
+
+	T_RBrace  shift 71
+	.  error
+
+
+state 49
 	Stmtsq : Stmts .  (19)
 	Stmts : Stmts . Stmt  (21)
 	Exprq : .  (23)
@@ -553,125 +635,283 @@ state 47
 	T_BoolConstant  shift 42
 	T_DoubleConstant  shift 43
 	T_StringConstant  shift 44
+	T_Minus  shift 45
+	T_Not  shift 46
 	T_Semicolon  reduce 23
 	T_RBrace  reduce 19
 
-	Y_Identifier  goto 45
-	Stmt  goto 61
-	Exprq  goto 49
-	Expr  goto 50
-	LValue  goto 51
-	Expr2  goto 52
-	Expr3  goto 53
-	Constants  goto 54
-	Y_IntConstant  goto 55
-	Y_DoubleConstant  goto 56
-	Y_BoolConstant  goto 57
-	Y_StringConstant  goto 58
+	Y_Identifier  goto 47
+	Stmt  goto 72
+	Exprq  goto 51
+	Expr  goto 52
+	LValue  goto 53
+	Expr2  goto 54
+	Expr3  goto 55
+	Expr4  goto 56
+	Expr5  goto 57
+	Expr6  goto 58
+	Expr7  goto 59
+	Y_Minus  goto 60
+	Expr8  goto 61
+	Y_Not  goto 62
+	Expr9  goto 63
+	NoOp  goto 64
+	Constant  goto 65
+	Y_IntConstant  goto 66
+	Y_DoubleConstant  goto 67
+	Y_BoolConstant  goto 68
+	Y_StringConstant  goto 69
 
 
-state 48
+state 50
 	Stmts : Stmt .  (20)
 
 	.  reduce 20
 
 
-state 49
+state 51
 	Stmt : Exprq . T_Semicolon  (22)
 
-	T_Semicolon  shift 62
+	T_Semicolon  shift 73
 	.  error
 
 
-state 50
+state 52
 	Exprq : Expr .  (24)
 
 	.  reduce 24
 
 
-state 51
+state 53
 	Expr : LValue . Y_Assign Expr  (25)
 
-	T_Assign  shift 63
+	T_Assign  shift 74
 	.  error
 
-	Y_Assign  goto 64
-
-
-state 52
-	Expr : Expr2 .  (26)
-
-	.  reduce 26
-
-
-state 53
-	Expr2 : Expr3 . Y_Or Expr2  (27)
-
-	Y_Or  shift 65
-	.  error
+	Y_Assign  goto 75
 
 
 state 54
-	Expr3 : Constants .  (28)
+	Expr : Expr2 .  (26)
+	Expr2 : Expr2 . Y_Or Expr3  (27)
 
-	.  reduce 28
+	T_Or  shift 76
+	T_Semicolon  reduce 26
+
+	Y_Or  goto 77
 
 
 state 55
-	Constants : Y_IntConstant .  (30)
+	Expr2 : Expr3 .  (28)
+	Expr3 : Expr3 . Y_And Expr4  (29)
 
-	.  reduce 30
+	T_And  shift 78
+	T_Or  reduce 28
+	T_Semicolon  reduce 28
+
+	Y_And  goto 79
 
 
 state 56
-	Constants : Y_DoubleConstant .  (31)
+	Expr3 : Expr4 .  (30)
+	Expr4 : Expr4 . Y_Equal Expr5  (31)
+	Expr4 : Expr4 . Y_NotEqual Expr5  (32)
 
-	.  reduce 31
+	T_Equal  shift 80
+	T_NotEqual  shift 81
+	T_And  reduce 30
+	T_Or  reduce 30
+	T_Semicolon  reduce 30
+
+	Y_Equal  goto 82
+	Y_NotEqual  goto 83
 
 
 state 57
-	Constants : Y_BoolConstant .  (32)
+	Expr4 : Expr5 .  (33)
+	Expr5 : Expr5 . Y_Less Expr6  (34)
+	Expr5 : Expr5 . Y_LessEqual Expr6  (35)
+	Expr5 : Expr5 . Y_Greater Expr6  (36)
+	Expr5 : Expr5 . Y_GreaterEqual Expr6  (37)
 
-	.  reduce 32
+	T_Less  shift 84
+	T_LessEqual  shift 85
+	T_Greater  shift 86
+	T_GreaterEqual  shift 87
+	T_Equal  reduce 33
+	T_NotEqual  reduce 33
+	T_And  reduce 33
+	T_Or  reduce 33
+	T_Semicolon  reduce 33
+
+	Y_Less  goto 88
+	Y_LessEqual  goto 89
+	Y_Greater  goto 90
+	Y_GreaterEqual  goto 91
 
 
 state 58
-	Constants : Y_StringConstant .  (33)
+	Expr5 : Expr6 .  (38)
+	Expr6 : Expr6 . Y_Plus Expr7  (39)
+	Expr6 : Expr6 . Y_Minus Expr7  (40)
 
-	.  reduce 33
+	T_Plus  shift 92
+	T_Minus  shift 45
+	T_Less  reduce 38
+	T_LessEqual  reduce 38
+	T_Greater  reduce 38
+	T_GreaterEqual  reduce 38
+	T_Equal  reduce 38
+	T_NotEqual  reduce 38
+	T_And  reduce 38
+	T_Or  reduce 38
+	T_Semicolon  reduce 38
+
+	Y_Plus  goto 93
+	Y_Minus  goto 94
 
 
 state 59
+	Expr6 : Expr7 .  (41)
+	Expr7 : Expr7 . Y_Times Expr8  (42)
+	Expr7 : Expr7 . Y_Div Expr8  (43)
+	Expr7 : Expr7 . Y_Mod Expr8  (44)
+
+	T_Times  shift 95
+	T_Div  shift 96
+	T_Mod  shift 97
+	T_Plus  reduce 41
+	T_Minus  reduce 41
+	T_Less  reduce 41
+	T_LessEqual  reduce 41
+	T_Greater  reduce 41
+	T_GreaterEqual  reduce 41
+	T_Equal  reduce 41
+	T_NotEqual  reduce 41
+	T_And  reduce 41
+	T_Or  reduce 41
+	T_Semicolon  reduce 41
+
+	Y_Times  goto 98
+	Y_Div  goto 99
+	Y_Mod  goto 100
+
+
+state 60
+	Expr8 : Y_Minus . Expr9  (47)
+
+	T_IntConstant  shift 41
+	T_BoolConstant  shift 42
+	T_DoubleConstant  shift 43
+	T_StringConstant  shift 44
+	.  error
+
+	Expr9  goto 101
+	NoOp  goto 64
+	Constant  goto 65
+	Y_IntConstant  goto 66
+	Y_DoubleConstant  goto 67
+	Y_BoolConstant  goto 68
+	Y_StringConstant  goto 69
+
+
+state 61
+	Expr7 : Expr8 .  (45)
+
+	.  reduce 45
+
+
+state 62
+	Expr8 : Y_Not . Expr9  (46)
+
+	T_IntConstant  shift 41
+	T_BoolConstant  shift 42
+	T_DoubleConstant  shift 43
+	T_StringConstant  shift 44
+	.  error
+
+	Expr9  goto 102
+	NoOp  goto 64
+	Constant  goto 65
+	Y_IntConstant  goto 66
+	Y_DoubleConstant  goto 67
+	Y_BoolConstant  goto 68
+	Y_StringConstant  goto 69
+
+
+state 63
+	Expr8 : Expr9 .  (48)
+
+	.  reduce 48
+
+
+state 64
+	Expr9 : NoOp .  (49)
+
+	.  reduce 49
+
+
+state 65
+	NoOp : Constant .  (50)
+
+	.  reduce 50
+
+
+state 66
+	Constant : Y_IntConstant .  (52)
+
+	.  reduce 52
+
+
+state 67
+	Constant : Y_DoubleConstant .  (53)
+
+	.  reduce 53
+
+
+state 68
+	Constant : Y_BoolConstant .  (54)
+
+	.  reduce 54
+
+
+state 69
+	Constant : Y_StringConstant .  (55)
+
+	.  reduce 55
+
+
+state 70
 	StmtVars : StmtVars VariableDecl .  (17)
 
 	.  reduce 17
 
 
-state 60
+state 71
 	StmtBlock : T_LBrace StmtVarsq Stmtsq T_RBrace .  (13)
 
 	.  reduce 13
 
 
-state 61
+state 72
 	Stmts : Stmts Stmt .  (21)
 
 	.  reduce 21
 
 
-state 62
+state 73
 	Stmt : Exprq T_Semicolon .  (22)
 
 	.  reduce 22
 
 
-state 63
-	Y_Assign : T_Assign .  (54)
+state 74
+	Y_Assign : T_Assign .  (75)
 
-	.  reduce 54
+	.  reduce 75
 
 
-state 64
+state 75
 	Expr : LValue Y_Assign . Expr  (25)
 
 	T_Identifier  shift 23
@@ -679,53 +919,670 @@ state 64
 	T_BoolConstant  shift 42
 	T_DoubleConstant  shift 43
 	T_StringConstant  shift 44
+	T_Minus  shift 45
+	T_Not  shift 46
 	.  error
 
-	Y_Identifier  goto 45
-	Expr  goto 66
-	LValue  goto 51
-	Expr2  goto 52
-	Expr3  goto 53
-	Constants  goto 54
-	Y_IntConstant  goto 55
-	Y_DoubleConstant  goto 56
-	Y_BoolConstant  goto 57
-	Y_StringConstant  goto 58
+	Y_Identifier  goto 47
+	Expr  goto 103
+	LValue  goto 53
+	Expr2  goto 54
+	Expr3  goto 55
+	Expr4  goto 56
+	Expr5  goto 57
+	Expr6  goto 58
+	Expr7  goto 59
+	Y_Minus  goto 60
+	Expr8  goto 61
+	Y_Not  goto 62
+	Expr9  goto 63
+	NoOp  goto 64
+	Constant  goto 65
+	Y_IntConstant  goto 66
+	Y_DoubleConstant  goto 67
+	Y_BoolConstant  goto 68
+	Y_StringConstant  goto 69
 
 
-state 65
-	Expr2 : Expr3 Y_Or . Expr2  (27)
+state 76
+	Y_Or : T_Or .  (76)
+
+	.  reduce 76
+
+
+state 77
+	Expr2 : Expr2 Y_Or . Expr3  (27)
 
 	T_IntConstant  shift 41
 	T_BoolConstant  shift 42
 	T_DoubleConstant  shift 43
 	T_StringConstant  shift 44
+	T_Minus  shift 45
+	T_Not  shift 46
 	.  error
 
-	Expr2  goto 67
-	Expr3  goto 53
-	Constants  goto 54
-	Y_IntConstant  goto 55
-	Y_DoubleConstant  goto 56
-	Y_BoolConstant  goto 57
-	Y_StringConstant  goto 58
+	Expr3  goto 104
+	Expr4  goto 56
+	Expr5  goto 57
+	Expr6  goto 58
+	Expr7  goto 59
+	Y_Minus  goto 60
+	Expr8  goto 61
+	Y_Not  goto 62
+	Expr9  goto 63
+	NoOp  goto 64
+	Constant  goto 65
+	Y_IntConstant  goto 66
+	Y_DoubleConstant  goto 67
+	Y_BoolConstant  goto 68
+	Y_StringConstant  goto 69
 
 
-state 66
+state 78
+	Y_And : T_And .  (88)
+
+	.  reduce 88
+
+
+state 79
+	Expr3 : Expr3 Y_And . Expr4  (29)
+
+	T_IntConstant  shift 41
+	T_BoolConstant  shift 42
+	T_DoubleConstant  shift 43
+	T_StringConstant  shift 44
+	T_Minus  shift 45
+	T_Not  shift 46
+	.  error
+
+	Expr4  goto 105
+	Expr5  goto 57
+	Expr6  goto 58
+	Expr7  goto 59
+	Y_Minus  goto 60
+	Expr8  goto 61
+	Y_Not  goto 62
+	Expr9  goto 63
+	NoOp  goto 64
+	Constant  goto 65
+	Y_IntConstant  goto 66
+	Y_DoubleConstant  goto 67
+	Y_BoolConstant  goto 68
+	Y_StringConstant  goto 69
+
+
+state 80
+	Y_Equal : T_Equal .  (86)
+
+	.  reduce 86
+
+
+state 81
+	Y_NotEqual : T_NotEqual .  (87)
+
+	.  reduce 87
+
+
+state 82
+	Expr4 : Expr4 Y_Equal . Expr5  (31)
+
+	T_IntConstant  shift 41
+	T_BoolConstant  shift 42
+	T_DoubleConstant  shift 43
+	T_StringConstant  shift 44
+	T_Minus  shift 45
+	T_Not  shift 46
+	.  error
+
+	Expr5  goto 106
+	Expr6  goto 58
+	Expr7  goto 59
+	Y_Minus  goto 60
+	Expr8  goto 61
+	Y_Not  goto 62
+	Expr9  goto 63
+	NoOp  goto 64
+	Constant  goto 65
+	Y_IntConstant  goto 66
+	Y_DoubleConstant  goto 67
+	Y_BoolConstant  goto 68
+	Y_StringConstant  goto 69
+
+
+state 83
+	Expr4 : Expr4 Y_NotEqual . Expr5  (32)
+
+	T_IntConstant  shift 41
+	T_BoolConstant  shift 42
+	T_DoubleConstant  shift 43
+	T_StringConstant  shift 44
+	T_Minus  shift 45
+	T_Not  shift 46
+	.  error
+
+	Expr5  goto 107
+	Expr6  goto 58
+	Expr7  goto 59
+	Y_Minus  goto 60
+	Expr8  goto 61
+	Y_Not  goto 62
+	Expr9  goto 63
+	NoOp  goto 64
+	Constant  goto 65
+	Y_IntConstant  goto 66
+	Y_DoubleConstant  goto 67
+	Y_BoolConstant  goto 68
+	Y_StringConstant  goto 69
+
+
+state 84
+	Y_Less : T_Less .  (82)
+
+	.  reduce 82
+
+
+state 85
+	Y_LessEqual : T_LessEqual .  (83)
+
+	.  reduce 83
+
+
+state 86
+	Y_Greater : T_Greater .  (84)
+
+	.  reduce 84
+
+
+state 87
+	Y_GreaterEqual : T_GreaterEqual .  (85)
+
+	.  reduce 85
+
+
+state 88
+	Expr5 : Expr5 Y_Less . Expr6  (34)
+
+	T_IntConstant  shift 41
+	T_BoolConstant  shift 42
+	T_DoubleConstant  shift 43
+	T_StringConstant  shift 44
+	T_Minus  shift 45
+	T_Not  shift 46
+	.  error
+
+	Expr6  goto 108
+	Expr7  goto 59
+	Y_Minus  goto 60
+	Expr8  goto 61
+	Y_Not  goto 62
+	Expr9  goto 63
+	NoOp  goto 64
+	Constant  goto 65
+	Y_IntConstant  goto 66
+	Y_DoubleConstant  goto 67
+	Y_BoolConstant  goto 68
+	Y_StringConstant  goto 69
+
+
+state 89
+	Expr5 : Expr5 Y_LessEqual . Expr6  (35)
+
+	T_IntConstant  shift 41
+	T_BoolConstant  shift 42
+	T_DoubleConstant  shift 43
+	T_StringConstant  shift 44
+	T_Minus  shift 45
+	T_Not  shift 46
+	.  error
+
+	Expr6  goto 109
+	Expr7  goto 59
+	Y_Minus  goto 60
+	Expr8  goto 61
+	Y_Not  goto 62
+	Expr9  goto 63
+	NoOp  goto 64
+	Constant  goto 65
+	Y_IntConstant  goto 66
+	Y_DoubleConstant  goto 67
+	Y_BoolConstant  goto 68
+	Y_StringConstant  goto 69
+
+
+state 90
+	Expr5 : Expr5 Y_Greater . Expr6  (36)
+
+	T_IntConstant  shift 41
+	T_BoolConstant  shift 42
+	T_DoubleConstant  shift 43
+	T_StringConstant  shift 44
+	T_Minus  shift 45
+	T_Not  shift 46
+	.  error
+
+	Expr6  goto 110
+	Expr7  goto 59
+	Y_Minus  goto 60
+	Expr8  goto 61
+	Y_Not  goto 62
+	Expr9  goto 63
+	NoOp  goto 64
+	Constant  goto 65
+	Y_IntConstant  goto 66
+	Y_DoubleConstant  goto 67
+	Y_BoolConstant  goto 68
+	Y_StringConstant  goto 69
+
+
+state 91
+	Expr5 : Expr5 Y_GreaterEqual . Expr6  (37)
+
+	T_IntConstant  shift 41
+	T_BoolConstant  shift 42
+	T_DoubleConstant  shift 43
+	T_StringConstant  shift 44
+	T_Minus  shift 45
+	T_Not  shift 46
+	.  error
+
+	Expr6  goto 111
+	Expr7  goto 59
+	Y_Minus  goto 60
+	Expr8  goto 61
+	Y_Not  goto 62
+	Expr9  goto 63
+	NoOp  goto 64
+	Constant  goto 65
+	Y_IntConstant  goto 66
+	Y_DoubleConstant  goto 67
+	Y_BoolConstant  goto 68
+	Y_StringConstant  goto 69
+
+
+state 92
+	Y_Plus : T_Plus .  (77)
+
+	.  reduce 77
+
+
+state 93
+	Expr6 : Expr6 Y_Plus . Expr7  (39)
+
+	T_IntConstant  shift 41
+	T_BoolConstant  shift 42
+	T_DoubleConstant  shift 43
+	T_StringConstant  shift 44
+	T_Minus  shift 45
+	T_Not  shift 46
+	.  error
+
+	Expr7  goto 112
+	Y_Minus  goto 60
+	Expr8  goto 61
+	Y_Not  goto 62
+	Expr9  goto 63
+	NoOp  goto 64
+	Constant  goto 65
+	Y_IntConstant  goto 66
+	Y_DoubleConstant  goto 67
+	Y_BoolConstant  goto 68
+	Y_StringConstant  goto 69
+
+
+state 94
+	Expr6 : Expr6 Y_Minus . Expr7  (40)
+
+	T_IntConstant  shift 41
+	T_BoolConstant  shift 42
+	T_DoubleConstant  shift 43
+	T_StringConstant  shift 44
+	T_Minus  shift 45
+	T_Not  shift 46
+	.  error
+
+	Expr7  goto 113
+	Y_Minus  goto 60
+	Expr8  goto 61
+	Y_Not  goto 62
+	Expr9  goto 63
+	NoOp  goto 64
+	Constant  goto 65
+	Y_IntConstant  goto 66
+	Y_DoubleConstant  goto 67
+	Y_BoolConstant  goto 68
+	Y_StringConstant  goto 69
+
+
+state 95
+	Y_Times : T_Times .  (79)
+
+	.  reduce 79
+
+
+state 96
+	Y_Div : T_Div .  (80)
+
+	.  reduce 80
+
+
+state 97
+	Y_Mod : T_Mod .  (81)
+
+	.  reduce 81
+
+
+state 98
+	Expr7 : Expr7 Y_Times . Expr8  (42)
+
+	T_IntConstant  shift 41
+	T_BoolConstant  shift 42
+	T_DoubleConstant  shift 43
+	T_StringConstant  shift 44
+	T_Minus  shift 45
+	T_Not  shift 46
+	.  error
+
+	Y_Minus  goto 60
+	Expr8  goto 114
+	Y_Not  goto 62
+	Expr9  goto 63
+	NoOp  goto 64
+	Constant  goto 65
+	Y_IntConstant  goto 66
+	Y_DoubleConstant  goto 67
+	Y_BoolConstant  goto 68
+	Y_StringConstant  goto 69
+
+
+state 99
+	Expr7 : Expr7 Y_Div . Expr8  (43)
+
+	T_IntConstant  shift 41
+	T_BoolConstant  shift 42
+	T_DoubleConstant  shift 43
+	T_StringConstant  shift 44
+	T_Minus  shift 45
+	T_Not  shift 46
+	.  error
+
+	Y_Minus  goto 60
+	Expr8  goto 115
+	Y_Not  goto 62
+	Expr9  goto 63
+	NoOp  goto 64
+	Constant  goto 65
+	Y_IntConstant  goto 66
+	Y_DoubleConstant  goto 67
+	Y_BoolConstant  goto 68
+	Y_StringConstant  goto 69
+
+
+state 100
+	Expr7 : Expr7 Y_Mod . Expr8  (44)
+
+	T_IntConstant  shift 41
+	T_BoolConstant  shift 42
+	T_DoubleConstant  shift 43
+	T_StringConstant  shift 44
+	T_Minus  shift 45
+	T_Not  shift 46
+	.  error
+
+	Y_Minus  goto 60
+	Expr8  goto 116
+	Y_Not  goto 62
+	Expr9  goto 63
+	NoOp  goto 64
+	Constant  goto 65
+	Y_IntConstant  goto 66
+	Y_DoubleConstant  goto 67
+	Y_BoolConstant  goto 68
+	Y_StringConstant  goto 69
+
+
+state 101
+	Expr8 : Y_Minus Expr9 .  (47)
+
+	.  reduce 47
+
+
+state 102
+	Expr8 : Y_Not Expr9 .  (46)
+
+	.  reduce 46
+
+
+state 103
 	Expr : LValue Y_Assign Expr .  (25)
 
 	.  reduce 25
 
 
-state 67
-	Expr2 : Expr3 Y_Or Expr2 .  (27)
+state 104
+	Expr2 : Expr2 Y_Or Expr3 .  (27)
+	Expr3 : Expr3 . Y_And Expr4  (29)
 
-	.  reduce 27
+	T_And  shift 78
+	T_Or  reduce 27
+	T_Semicolon  reduce 27
+
+	Y_And  goto 79
 
 
-Rules never reduced:
-	Y_Minus : T_Minus  (53)
+state 105
+	Expr3 : Expr3 Y_And Expr4 .  (29)
+	Expr4 : Expr4 . Y_Equal Expr5  (31)
+	Expr4 : Expr4 . Y_NotEqual Expr5  (32)
+
+	T_Equal  shift 80
+	T_NotEqual  shift 81
+	T_And  reduce 29
+	T_Or  reduce 29
+	T_Semicolon  reduce 29
+
+	Y_Equal  goto 82
+	Y_NotEqual  goto 83
 
 
-55 terminals, 37 nonterminals
-55 grammar rules, 68 states
+state 106
+	Expr4 : Expr4 Y_Equal Expr5 .  (31)
+	Expr5 : Expr5 . Y_Less Expr6  (34)
+	Expr5 : Expr5 . Y_LessEqual Expr6  (35)
+	Expr5 : Expr5 . Y_Greater Expr6  (36)
+	Expr5 : Expr5 . Y_GreaterEqual Expr6  (37)
+
+	T_Less  shift 84
+	T_LessEqual  shift 85
+	T_Greater  shift 86
+	T_GreaterEqual  shift 87
+	T_Equal  reduce 31
+	T_NotEqual  reduce 31
+	T_And  reduce 31
+	T_Or  reduce 31
+	T_Semicolon  reduce 31
+
+	Y_Less  goto 88
+	Y_LessEqual  goto 89
+	Y_Greater  goto 90
+	Y_GreaterEqual  goto 91
+
+
+state 107
+	Expr4 : Expr4 Y_NotEqual Expr5 .  (32)
+	Expr5 : Expr5 . Y_Less Expr6  (34)
+	Expr5 : Expr5 . Y_LessEqual Expr6  (35)
+	Expr5 : Expr5 . Y_Greater Expr6  (36)
+	Expr5 : Expr5 . Y_GreaterEqual Expr6  (37)
+
+	T_Less  shift 84
+	T_LessEqual  shift 85
+	T_Greater  shift 86
+	T_GreaterEqual  shift 87
+	T_Equal  reduce 32
+	T_NotEqual  reduce 32
+	T_And  reduce 32
+	T_Or  reduce 32
+	T_Semicolon  reduce 32
+
+	Y_Less  goto 88
+	Y_LessEqual  goto 89
+	Y_Greater  goto 90
+	Y_GreaterEqual  goto 91
+
+
+state 108
+	Expr5 : Expr5 Y_Less Expr6 .  (34)
+	Expr6 : Expr6 . Y_Plus Expr7  (39)
+	Expr6 : Expr6 . Y_Minus Expr7  (40)
+
+	T_Plus  shift 92
+	T_Minus  shift 45
+	T_Less  reduce 34
+	T_LessEqual  reduce 34
+	T_Greater  reduce 34
+	T_GreaterEqual  reduce 34
+	T_Equal  reduce 34
+	T_NotEqual  reduce 34
+	T_And  reduce 34
+	T_Or  reduce 34
+	T_Semicolon  reduce 34
+
+	Y_Plus  goto 93
+	Y_Minus  goto 94
+
+
+state 109
+	Expr5 : Expr5 Y_LessEqual Expr6 .  (35)
+	Expr6 : Expr6 . Y_Plus Expr7  (39)
+	Expr6 : Expr6 . Y_Minus Expr7  (40)
+
+	T_Plus  shift 92
+	T_Minus  shift 45
+	T_Less  reduce 35
+	T_LessEqual  reduce 35
+	T_Greater  reduce 35
+	T_GreaterEqual  reduce 35
+	T_Equal  reduce 35
+	T_NotEqual  reduce 35
+	T_And  reduce 35
+	T_Or  reduce 35
+	T_Semicolon  reduce 35
+
+	Y_Plus  goto 93
+	Y_Minus  goto 94
+
+
+state 110
+	Expr5 : Expr5 Y_Greater Expr6 .  (36)
+	Expr6 : Expr6 . Y_Plus Expr7  (39)
+	Expr6 : Expr6 . Y_Minus Expr7  (40)
+
+	T_Plus  shift 92
+	T_Minus  shift 45
+	T_Less  reduce 36
+	T_LessEqual  reduce 36
+	T_Greater  reduce 36
+	T_GreaterEqual  reduce 36
+	T_Equal  reduce 36
+	T_NotEqual  reduce 36
+	T_And  reduce 36
+	T_Or  reduce 36
+	T_Semicolon  reduce 36
+
+	Y_Plus  goto 93
+	Y_Minus  goto 94
+
+
+state 111
+	Expr5 : Expr5 Y_GreaterEqual Expr6 .  (37)
+	Expr6 : Expr6 . Y_Plus Expr7  (39)
+	Expr6 : Expr6 . Y_Minus Expr7  (40)
+
+	T_Plus  shift 92
+	T_Minus  shift 45
+	T_Less  reduce 37
+	T_LessEqual  reduce 37
+	T_Greater  reduce 37
+	T_GreaterEqual  reduce 37
+	T_Equal  reduce 37
+	T_NotEqual  reduce 37
+	T_And  reduce 37
+	T_Or  reduce 37
+	T_Semicolon  reduce 37
+
+	Y_Plus  goto 93
+	Y_Minus  goto 94
+
+
+state 112
+	Expr6 : Expr6 Y_Plus Expr7 .  (39)
+	Expr7 : Expr7 . Y_Times Expr8  (42)
+	Expr7 : Expr7 . Y_Div Expr8  (43)
+	Expr7 : Expr7 . Y_Mod Expr8  (44)
+
+	T_Times  shift 95
+	T_Div  shift 96
+	T_Mod  shift 97
+	T_Plus  reduce 39
+	T_Minus  reduce 39
+	T_Less  reduce 39
+	T_LessEqual  reduce 39
+	T_Greater  reduce 39
+	T_GreaterEqual  reduce 39
+	T_Equal  reduce 39
+	T_NotEqual  reduce 39
+	T_And  reduce 39
+	T_Or  reduce 39
+	T_Semicolon  reduce 39
+
+	Y_Times  goto 98
+	Y_Div  goto 99
+	Y_Mod  goto 100
+
+
+state 113
+	Expr6 : Expr6 Y_Minus Expr7 .  (40)
+	Expr7 : Expr7 . Y_Times Expr8  (42)
+	Expr7 : Expr7 . Y_Div Expr8  (43)
+	Expr7 : Expr7 . Y_Mod Expr8  (44)
+
+	T_Times  shift 95
+	T_Div  shift 96
+	T_Mod  shift 97
+	T_Plus  reduce 40
+	T_Minus  reduce 40
+	T_Less  reduce 40
+	T_LessEqual  reduce 40
+	T_Greater  reduce 40
+	T_GreaterEqual  reduce 40
+	T_Equal  reduce 40
+	T_NotEqual  reduce 40
+	T_And  reduce 40
+	T_Or  reduce 40
+	T_Semicolon  reduce 40
+
+	Y_Times  goto 98
+	Y_Div  goto 99
+	Y_Mod  goto 100
+
+
+state 114
+	Expr7 : Expr7 Y_Times Expr8 .  (42)
+
+	.  reduce 42
+
+
+state 115
+	Expr7 : Expr7 Y_Div Expr8 .  (43)
+
+	.  reduce 43
+
+
+state 116
+	Expr7 : Expr7 Y_Mod Expr8 .  (44)
+
+	.  reduce 44
+
+
+54 terminals, 57 nonterminals
+90 grammar rules, 117 states
