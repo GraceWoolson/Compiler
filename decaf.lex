@@ -18,7 +18,7 @@ int error(string msg, int line)
   return -1;
 }
 
-TokenType makeToken(TokenType type) {
+int makeToken(int type) {
     myTok = new Token(type, yytext, yylineno);
     return type;
 }

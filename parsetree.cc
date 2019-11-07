@@ -1,7 +1,4 @@
-#ifndef PARSE_TREE
-#define PARSE_TREE
-
-/* parsetree.h
+/* parsetree.cc
    Alistair Campbell
    2015--2019
    
@@ -14,76 +11,81 @@
 #include "tokentype.h" 
 #include "parsetree.h"
 
-
   /* prototype for yyerror, needed on my linux laptop */
 int yyerror(const char * s);
 
 using namespace std;
 
-struct ParseTree {
-  string description;
-  Token * token;                 // nullptr for nonterminal trees
-  vector<ParseTree *> children;  // empty for terminal trees
-  ParseTree(string description, ParseTree* c1): description(description),
-						token(nullptr)
-  {
-    addChild(c1);
-  }
-  
-  ParseTree(string description, ParseTree* c1, ParseTree* c2):
-    description(description), token(nullptr)
-  {
-    addChild(c1);
-    addChild(c2);
-  }
-  
-  ParseTree(string description, ParseTree* c1, ParseTree* c2, ParseTree *c3):
-    description(description), token(nullptr)
-  {
-    addChild(c1);
-    addChild(c2);
-    addChild(c3);
-  }
-  
-  ParseTree(string description, ParseTree* c1, ParseTree* c2, ParseTree *c3,
-	    ParseTree *c4): 
-    description(description), token(nullptr)
-  {
-    addChild(c1);
-    addChild(c2);
-    addChild(c3);
-    addChild(c4);
-  }
-  
-  ParseTree(string description) : description(description), token(nullptr) {}
-  ParseTree(Token * tokp) : token(tokp) {}
-  
-  void addChild(ParseTree * tree) {
-    children.push_back(tree);
-  }
-  
-  void addChild(ParseTree * tree1, ParseTree * tree2) {
-    children.push_back(tree1);
-    children.push_back(tree2);
-  }
-  
-  string toString() {
-    string answer = "";
-    if (token)
-      answer +=  token->toString();
-    else {
-      answer += "(" + description;
-      for (vector<ParseTree *>::iterator i=children.begin(); 
-           i != children.end(); i++) {
-        ParseTree *tree = *i;
-        if (!tree) answer += " EMPTY";
-        else answer += " " + tree->toString();
-      }
-      answer += ")";
+
+void adopt(ParseTree *treedest, ParseTree *treesource )
+{
+  for (ParseTree *child : treesource->children) {
+    treedest->addChild(child);
+  }    
+}
+
+ParseTree::ParseTree(string description, ParseTree* c1): description(description),
+							 token(nullptr), sem(nullptr),
+							 symtab(nullptr)
+{
+  addChild(c1);
+}
+
+ParseTree::ParseTree(string description, ParseTree* c1, ParseTree* c2):
+  description(description), token(nullptr), sem(nullptr), symtab(nullptr)
+{
+  addChild(c1);
+  addChild(c2);
+}
+
+ParseTree::ParseTree(string description, ParseTree* c1, ParseTree* c2, ParseTree *c3):
+  description(description), token(nullptr), sem(nullptr), symtab(nullptr)
+{
+  addChild(c1);
+  addChild(c2);
+  addChild(c3);
+}
+
+ParseTree::ParseTree(string description, ParseTree* c1, ParseTree* c2, ParseTree *c3,
+		     ParseTree *c4): 
+  description(description), token(nullptr), sem(nullptr), symtab(nullptr)
+{
+  addChild(c1);
+  addChild(c2);
+  addChild(c3);
+  addChild(c4);
+}
+
+ParseTree::ParseTree(string description) : description(description), token(nullptr),
+					   sem(nullptr),
+					   symtab(nullptr) {}
+ParseTree::ParseTree(Token * tokp) : token(tokp) {}
+
+void ParseTree::addChild(ParseTree * tree) {
+  children.push_back(tree);
+}
+
+void ParseTree::addChild(ParseTree * tree1, ParseTree * tree2) {
+  children.push_back(tree1);
+  children.push_back(tree2);
+}
+
+string ParseTree::toString() const {
+  string answer = "";
+  if (token)
+    answer +=  token->toString();
+  else {
+    answer += "(" + description;
+    for (vector<ParseTree *>::const_iterator i=children.begin(); 
+	 i != children.end(); i++) {
+      ParseTree *tree = *i;
+      if (!tree) answer += " EMPTY";
+      else answer += " " + tree->toString();
     }
-    return answer;
+    answer += ")";
   }
-};
+  return answer;
+}
 
 string base26(int x)
 {
@@ -127,13 +129,17 @@ void traverseTree(ParseTree * tree, int depth, int seq) {
     cout << "NULL" << endl; 
     return; 
   }
-  if (tree->token) {
-    cout << tree->token->toString() << endl; 
-    return; 
-  }
-  cout << tree->description << endl;
+  if (tree->token) 
+    cout << tree->token->toString();
+  else
+    cout << tree->description;
+  // output decorations too:
+  if (tree->sem) { cout << " SEMANTICS: " << tree->sem->to_string() << " "; }
+  if (tree->symtab) { cout << " SCOPE: " << tree->symtab->to_string() << " "; }
+  // done with decorations:
+  cout << endl;
+  if (tree->token) return;
   for (size_t i=0;i<tree->children.size();i++)
     traverseTree(tree->children[i], depth+1, i+1);
 }
 
-#endif

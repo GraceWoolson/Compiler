@@ -1,1 +1,14 @@
-int a; bool b; double d; string s; other wow; int[][] lst;
+class a {
+    int b;
+    void hi(string h){}
+    void hi(string h){}
+}
+
+class c extends a implements face {
+    int tyr;
+    string world(){}
+}
+
+interface face {
+    void hi(string z);
+}

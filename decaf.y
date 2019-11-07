@@ -65,11 +65,12 @@
 #include "tokentype.h"
 #include "parsetree.h"
 
+#include "semantics.h"  // New: a series of semantics objects
+
   /* we are building parse trees */
 #define YYSTYPE ParseTree *
 
 using namespace std;
-
 
  extern Token *myTok;
  extern int yylineno;
@@ -83,17 +84,52 @@ using namespace std;
  %}
 
 %%
- /* to see about shift reduce errors? https://stackoverflow.com/questions/30447829/rules-are-never-reduced-understanding-why */
 Program: Decls
 
 Decls: Decl { $$ = new ParseTree("program", $1); top = $$; }
     | Decls Decl { $1->addChild($2); }
 Decl: VariableDecl | FunctionDecl | ClassDecl | InterfaceDecl
 
-  /* interface declarations INCONSISTENT WITH OTHER * */
-InterfaceDecl: T_Interface Y_Identifier T_LBrace T_RBrace { $$ = new ParseTree("interface", $2); }
+  /* interface declarations */
+InterfaceDecl: T_Interface Y_Identifier T_LBrace T_RBrace { $$ = new ParseTree("interface", $2);
+                    Token *tok = $2->token;
+                    semantics *test = currentScope->local_lookup(tok->text);
+                    if (test) semantic_error("Interface redefined", tok->line);
+                    currentInterface = new S_interface;
+                    currentInterface->name = tok->text;
+                    currentInterface->line = tok->line;
+                    currentScope->insert(tok->text, currentInterface);
+                    all_decls.push_back(currentInterface);
+                    $$->sem = currentInterface;
+                }
     | InterfaceDecl2
-InterfaceDecl2: T_Interface InterfaceMiddle T_RBrace { $$ = $2; }
+InterfaceDecl2: T_Interface InterfaceMiddle T_RBrace { $$ = $2;
+                    Token *tok = $2->children[0]->token;
+                    semantics *test = currentScope->local_lookup(tok->text);
+                    if (test) semantic_error("Interface redefined", tok->line);
+                    openscope();
+                    currentInterface = new S_interface;
+                    currentInterface->name = tok->text;
+                    currentInterface->line = tok->line;
+                    for(ParseTree * child : $2->children){
+                        if (!(child == $2->children[0])){
+                            S_function * curr = new S_function;
+                            Token *tok = child->children[1]->token;
+                            curr->name = tok->text;
+                            for (ParseTree * f_tree : child->children[2]->children){
+                                S_variable * this_formal = dynamic_cast<S_variable *>(f_tree->sem);
+                                curr->formals.push_back(this_formal);
+                            }
+                            S_type *ret_type = dynamic_cast<S_type *>(child->children[0]->sem);
+                            (ret_type)? curr->returnType = ret_type : curr->returnType = NULL;
+                            currentInterface->functions.push_back(curr);
+                        }
+                    }
+                    $$->symtab = closescope();
+                    currentScope->insert(tok->text, currentInterface);
+                    all_decls.push_back(currentInterface);
+                    $$->sem = currentInterface;
+                }
 InterfaceMiddle: Y_Identifier T_LBrace Prototype { $$ = new ParseTree("interface", $1, $3); }
     | InterfaceMiddle Prototype { $1 -> addChild($2); }
 
@@ -101,12 +137,80 @@ Prototype: Type Y_Identifier T_LParen Formalsq T_RParen T_Semicolon { $$ = new P
     | Y_Void Y_Identifier T_LParen Formalsq T_RParen T_Semicolon { $$ = new ParseTree("prototype", $1, $2, $4); }
 
   /* class declarations */
-ClassDecl: T_Class Y_Identifier Extendsq Implementsq T_LBrace Fieldsq T_RBrace { $$ = new ParseTree("class", $2, $3, $4, $6); }
-    | T_Class Y_TypeIdentifier Extendsq Implementsq T_LBrace Fieldsq T_RBrace { $$ = new ParseTree("class", $2, $3, $4, $6); }
-Extendsq:
+ClassDecl:  T_Class Y_Identifier { Token *tok = $2->token;
+                    string class_name = tok->text;
+                    semantics *curr = topScope->local_lookup(tok->text);
+                    if (curr) semantic_error("Class redefined", tok->line);
+                    S_class * this_class = new S_class(class_name, tok->line);
+                    currentClass = this_class;
+                    openscope(); }
+        Extendsq { if ($4) { Token *tok = $4->children[0]->token;
+                    string class_name = tok->text;
+                    S_undefined * temp_parent = new S_undefined;
+                    temp_parent -> name = class_name;
+                    temp_parent -> line = tok->line;
+                    currentClass->parentClass = temp_parent;
+                    $$->sem = temp_parent;
+                }}
+        Implementsq { if ($6) {
+            for(ParseTree *i_tree : $6->children){
+                Token *tok = i_tree->token;
+                string interface_name = tok->text;
+                S_undefined * temp_interface = new S_undefined;
+                temp_interface->name = interface_name;
+                temp_interface->line = tok->line;
+                currentClass->interfaces.push_back(temp_interface);
+            }
+        }}
+        T_LBrace Fieldsq T_RBrace { $$ = new ParseTree("class", $2, $4, $6, $9);
+                for(ParseTree * child : $9->children){
+                    currentClass->fields.push_back(child->sem);
+                }
+                all_decls.push_back(currentClass);
+                topScope->insert(currentClass->name, currentClass);
+                $$->sem = currentClass;
+                currentClass = nullptr;
+                $$->symtab = closescope(); }
+
+    | T_Class Y_TypeIdentifier { Token *tok = $2->token;
+                    string class_name = tok->text;
+                    semantics *curr = topScope->local_lookup(tok->text);
+                    if (curr) semantic_error("Attempted class override", tok->line);
+                    S_class * this_class = new S_class(class_name, tok->line);
+                    currentClass = this_class;
+                    openscope(); }
+            Extendsq { if ($4) { Token *tok = $4->children[0]->token;
+                        string class_name = tok->text;
+                        S_undefined * temp_parent = new S_undefined;
+                        temp_parent -> name = class_name;
+                        temp_parent -> line = tok->line;
+                        currentClass->parentClass = temp_parent;
+                        $$->sem = temp_parent;
+                    }}
+            Implementsq { if ($6) {
+                for(ParseTree *i_tree : $6->children){
+                    Token *tok = i_tree->token;
+                    string interface_name = tok->text;
+                    S_undefined * temp_interface = new S_undefined;
+                    temp_interface->name = interface_name;
+                    temp_interface->line = tok->line;
+                    currentClass->interfaces.push_back(temp_interface);
+                }
+            }}
+            T_LBrace Fieldsq T_RBrace { $$ = new ParseTree("class", $2, $4, $6, $9);
+                    for(ParseTree * child : $9->children){
+                        currentClass->fields.push_back(child->sem);
+                    }
+                    all_decls.push_back(currentClass);
+                    topScope->insert(currentClass->name, currentClass);
+                    $$->sem = currentClass;
+                    currentClass = nullptr;
+                    $$->symtab = closescope(); }
+
+Extendsq: { $$ = nullptr; }
     | T_Extends Y_Identifier { $$ = new ParseTree("extends", $2); }
     | T_Extends Y_TypeIdentifier { $$ = new ParseTree("extends", $2); }
-Implementsq:
+Implementsq: { $$ = nullptr; }
     | Implements
 Implements: T_Implements Y_Identifier { $$ = new ParseTree("implements", $2); }
     | Implements T_Comma Y_Identifier { $1->addChild($3); }
@@ -117,18 +221,71 @@ Fieldsq: { $$ = new ParseTree("fields"); }
 
   /* variable declarations */
 VariableDecl: Variable T_Semicolon
-Variable: Type Y_Identifier { $$ = new ParseTree("variable", $1, $2); }
+Variable: Type Y_Identifier { $$ = new ParseTree("variable", $1, $2);
+                        Token *tok = $2->token;
+                        string var_name = tok->text;
+                        S_type *var_type = dynamic_cast<S_type *>($1->sem);
+                        semantics *curr = currentScope->local_lookup(tok->text);
+                        if (curr) semantic_error("Variable already defined",tok->line);
+                        S_variable *this_var = new S_variable();
+                        this_var->type = var_type;
+                        this_var->name = var_name;
+                        this_var->line = yylineno;
+                        currentScope->insert(var_name, this_var);
+                        all_decls.push_back(this_var);
+                        $$->sem = this_var; }
 
   /* function declarations */
-FunctionDecl: Type Y_Identifier T_LParen Formalsq T_RParen StmtBlock { $$ = new ParseTree("functiondecl", $1, $2, $4, $6); }
-    | Y_Void Y_Identifier T_LParen Formalsq T_RParen StmtBlock { $$ = new ParseTree("functiondecl", $1, $2, $4, $6); }
+FunctionDecl: Type Y_Identifier T_LParen {
+                    currentFunction = new S_function;
+                    Token *tok = $2->token;
+                    string func_name = tok->text;
+                    semantics *curr = currentScope->local_lookup(func_name);
+                    if (curr) semantic_error("Function already defined",tok->line);
+                    S_type *var_type = dynamic_cast<S_type *>($1->sem);
+                    currentFunction->name = func_name;
+                    currentFunction->returnType = var_type;
+                }
+        Formalsq { for(ParseTree *f_tree : $5->children){
+                        S_variable * this_formal = dynamic_cast<S_variable *>(f_tree->sem);
+                        currentFunction->formals.push_back(this_formal);
+                    }
+                }
+        T_RParen StmtBlock { $$ = new ParseTree("functiondecl", $1, $2, $5, $8);
+                    currentScope->insert(currentFunction->name, currentFunction);
+                    all_decls.push_back(currentFunction);
+                    $$->sem = currentFunction;
+                    currentFunction = nullptr; }
+
+    | Y_Void Y_Identifier T_LParen {
+                        currentFunction = new S_function;
+                        Token *tok = $2->token;
+                        string func_name = tok->text;
+                        semantics *curr = currentScope->local_lookup(func_name);
+                        if (curr) semantic_error("Function already defined",tok->line);
+                        //S_type *var_type = dynamic_cast<S_type *>($1->sem);
+                        currentFunction->name = func_name;
+                        currentFunction->returnType = NULL;
+                    }
+            Formalsq { for(ParseTree *f_tree : $5->children){
+                            S_variable * this_formal = dynamic_cast<S_variable *>(f_tree->sem);
+                            currentFunction->formals.push_back(this_formal);
+                        }
+                    }
+            T_RParen StmtBlock { $$ = new ParseTree("functiondecl", $1, $2, $5, $8);
+                        currentScope->insert(currentFunction->name, currentFunction);
+                        all_decls.push_back(currentFunction);
+                        $$->sem = currentFunction;
+                        currentFunction = nullptr; }
 Formalsq: { $$ = new ParseTree("formals"); }
     | Formals
 Formals: Variable { $$ = new ParseTree("formals", $1); }
     | Formals T_Comma Variable { $1->addChild($3); }
 
   /* Statement Blocks */
-StmtBlock: T_LBrace StmtVarsq Stmtsq T_RBrace { $$ = new ParseTree("stmtblock", $2, $3); }
+StmtBlock: T_LBrace { openscope(); }
+            StmtVarsq Stmtsq T_RBrace { $$ = new ParseTree("stmtblock", $3, $4);
+                                        $$->symtab = closescope(); }
 StmtVarsq: { $$ = new ParseTree("vardecls"); }
     | StmtVars
 StmtVars: VariableDecl { $$ = new ParseTree("vardecls", $1); }
@@ -137,16 +294,18 @@ Stmtsq: { $$ = new ParseTree("stmts"); }
     | Stmts
 Stmts: Stmt { $$ = new ParseTree("stmts", $1); }
     | Stmts Stmt { $1->addChild($2); }
-  /* no PrintStmt necessary because it is invoked as a call?? */
-Stmt: Exprq T_Semicolon | StmtBlock | IfStmt | WhileStmt | ForStmt | BreakStmt
+Stmt: MatchedStmt | UnmatchedStmt
+MatchedStmt: Exprq T_Semicolon | StmtBlock | MatchedIf | BreakStmt
     | ReturnStmt | PrintStmt
+UnmatchedStmt: OpenIf | ForStmt | WhileStmt
 
   /* Statements */
-IfStmt: MatchedIf | OpenIf
-MatchedIf: T_If Expr StmtBlock T_Else StmtBlock { $$ = new ParseTree("if", $2, $3, $5); }
-OpenIf: T_If Expr StmtBlock { $$ = new ParseTree("if", $2, $3); }
+MatchedIf: T_If T_LParen Expr T_RParen MatchedStmt T_Else MatchedStmt { $$ = new ParseTree("if", $3, $5, $7); }
+OpenIf: T_If T_LParen Expr T_RParen Stmt { $$ = new ParseTree("if", $3, $5); }
+    | T_If T_LParen Expr T_RParen MatchedStmt T_Else UnmatchedStmt { $$ = new ParseTree("if", $3, $5, $7); }
 
-WhileStmt: T_While T_LParen Expr T_RParen Stmt { $$ = new ParseTree("while", $3, $5); }
+
+WhileStmt: T_While T_LParen Expr T_RParen StmtBlock { $$ = new ParseTree("while", $3, $5); }
 
   /* inconsistent output (NULL instead of nullstmt) */
 ForStmt: T_For T_LParen ForExprq T_Semicolon Expr T_Semicolon ForExprq T_RParen Stmt { $$ = new ParseTree("for", $3, $5, $7, $9); }
@@ -210,13 +369,38 @@ Actuals: Expr { $$ = new ParseTree("actuals", $1); }
 
   /* types! */
 NewArrayType: Type | Y_Identifier { $$ = new ParseTree("usertype", $1); }
-Type: Primtype { $$ = new ParseTree("primtype", $1); }
-    | Usertype { $$ = new ParseTree("usertype", $1); }
-    | Lsttype { $$ = new ParseTree("arraytype", $1); }
+Type: Primtype
+    | Usertype
+    | Lsttype
 
-Primtype: Y_Int | Y_Double | Y_Bool | Y_String
-Usertype: Y_TypeIdentifier
-Lsttype: Type T_LBracket T_RBracket
+Primtype: Y_Int { $$ = new ParseTree("primtype", $1);
+                  $$->sem = topScope->lookup("int"); }
+        | Y_Double { $$ = new ParseTree("primtype", $1);
+                     $$->sem = topScope->lookup("double"); }
+        | Y_Bool { $$ = new ParseTree("primtype", $1);
+                   $$->sem = topScope->lookup("bool"); }
+        | Y_String { $$ = new ParseTree("primtype", $1);
+                     $$->sem = topScope->lookup("string"); }
+Usertype: Y_TypeIdentifier { $$ = new ParseTree("usertype", $1);
+            string type_name = $1->token->text;
+            semantics *thing = topScope->lookup(type_name);
+        if (thing == nullptr) {
+            S_type *undef_type = new S_undefined;
+            undef_type->name = type_name;
+            undef_type->line = yylineno;
+            $$->sem = undef_type;
+        }
+        else if (dynamic_cast<S_type *>(thing))
+            $$->sem = thing;
+        else
+            semantic_error(type_name + " is not a type",
+                 $1->token->line); }
+Lsttype: Type T_LBracket T_RBracket { $$ = new ParseTree("arraytype", $1);
+            S_arraytype *this_type = new S_arraytype;
+            this_type->element_type = dynamic_cast<S_type *>($1->children[0]->sem);
+            this_type->line = yylineno;
+            $$->sem = this_type;
+        }
 
   /* terminals */
 Y_IntConstant: T_IntConstant { $$ = new ParseTree(myTok); }

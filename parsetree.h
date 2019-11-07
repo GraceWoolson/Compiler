@@ -13,7 +13,7 @@
 #include <cstdio>
 #include <vector>
 #include "tokentype.h" 
-
+#include "semantics.h"
 
   /* prototype for yyerror, needed on my linux laptop */
 int yyerror(const char * s);
@@ -23,66 +23,30 @@ using namespace std;
 struct ParseTree {
   string description;
   Token * token;                 // nullptr for nonterminal trees
+  semantics * sem;
+  Symtab *symtab;                // new:  attach a symbol table to a parse tree.
   vector<ParseTree *> children;  // empty for terminal trees
-  ParseTree(string description, ParseTree* c1): description(description),
-						token(nullptr)
-  {
-    addChild(c1);
-  }
+
+  ParseTree(string description, ParseTree* c1);
+
+  ParseTree(string description, ParseTree* c1, ParseTree* c2);
   
-  ParseTree(string description, ParseTree* c1, ParseTree* c2):
-    description(description), token(nullptr)
-  {
-    addChild(c1);
-    addChild(c2);
-  }
-  
-  ParseTree(string description, ParseTree* c1, ParseTree* c2, ParseTree *c3):
-    description(description), token(nullptr)
-  {
-    addChild(c1);
-    addChild(c2);
-    addChild(c3);
-  }
+  ParseTree(string description, ParseTree* c1, ParseTree* c2, ParseTree *c3);
   
   ParseTree(string description, ParseTree* c1, ParseTree* c2, ParseTree *c3,
-	    ParseTree *c4): 
-    description(description), token(nullptr)
-  {
-    addChild(c1);
-    addChild(c2);
-    addChild(c3);
-    addChild(c4);
-  }
+	    ParseTree *c4); 
   
-  ParseTree(string description) : description(description), token(nullptr) {}
-  ParseTree(Token * tokp) : token(tokp) {}
+  ParseTree(string description);
+
+  ParseTree(Token * tokp);
   
-  void addChild(ParseTree * tree) {
-    children.push_back(tree);
-  }
+  void addChild(ParseTree * tree);
   
-  void addChild(ParseTree * tree1, ParseTree * tree2) {
-    children.push_back(tree1);
-    children.push_back(tree2);
-  }
+  void addChild(ParseTree * tree1, ParseTree * tree2);
+
   
-  string toString() {
-    string answer = "";
-    if (token)
-      answer +=  token->toString();
-    else {
-      answer += "(" + description;
-      for (vector<ParseTree *>::iterator i=children.begin(); 
-           i != children.end(); i++) {
-        ParseTree *tree = *i;
-        if (!tree) answer += " EMPTY";
-        else answer += " " + tree->toString();
-      }
-      answer += ")";
-    }
-    return answer;
-  }
+  string toString() const;
+
 };
 
 string base26(int x);
