@@ -3,9 +3,10 @@
 #define SEMANTICS
 
 #include <map>
-
+#include <set>
 
 struct semantics;
+extern set<semantics *> marked;  // used to avoid infinite recursion in cycles.
 
 typedef map <string, semantics *> Dictionary;
 
@@ -14,10 +15,15 @@ struct Symtab {
   // Chained togeher to represent nested scopes.
  public:
   Dictionary dict;
+  int serial;
+  static int next_serial;
+
   Symtab(Symtab *p);
   semantics * lookup(string key);
   semantics * local_lookup(string key);
 
+  void ensure_undefined(string key, int line);  // semantic_error if key already defined
+                                      // locally.
   void insert(string key, semantics * item);
   void replace(string key, semantics * item);
   string to_string();
@@ -33,7 +39,10 @@ struct semantics {
   virtual string to_string() = 0;
   // at least one pure virtual function makes the class abstract
   // (not instantiable.)
-  virtual void replace_undefined(Symtab *) { }
+  virtual void replace_undefined(Symtab *) {
+    if (marked.count(this)) return;
+    marked.insert(this);
+  }
 
   int line;  // line where this semantics object was created.
 };
@@ -53,19 +62,26 @@ struct S_variable : public semantics {
   virtual string to_string() { return "S_variable(" + name + ": "
                                                     + type->to_string() + ")"; }
   virtual void replace_undefined(Symtab *scope) {
+    if (marked.count(this)) return;
+    marked.insert(this);
     if (type->is_undefined())
       type = get_real_type(type->name, line, scope);
-    else
-      type->replace_undefined(scope);
+    type->replace_undefined(scope);
   }
 };
 
 struct S_function : public semantics {
-  virtual string to_string() { return "S_function"; }
+  virtual string to_string() { string print = "S_function "+name+" (";
+    for (S_variable * f : formals)
+      print += f->to_string() + " ";
+    print += string(") -> ") + (returnType ? returnType->to_string() : string("VOID"));
+    return print; }
   string name;
   vector<S_variable *> formals;
   S_type * returnType;  // NULL for a void function
   virtual void replace_undefined(Symtab *scope) {
+    if (marked.count(this)) return;
+    marked.insert(this);
     if (returnType) {
       if (returnType->is_undefined())
 	returnType = get_real_type(returnType->name, line, scope);
@@ -78,9 +94,16 @@ struct S_function : public semantics {
 };
 
 struct S_interface : public S_type {
-  virtual string to_string() { return "S_interface"; }
+  virtual string to_string() {
+    string result = "S_interface "+ name + " ";
+    //    for (S_function* f : functions)
+    //  result += "Prototype: " + f->to_string() + " ";
+    return result;
+  }
   vector<S_function *> functions;
   virtual void replace_undefined(Symtab *scope) {
+    if (marked.count(this)) return;
+    marked.insert(this);
     for (S_function *f : functions)
       f->replace_undefined(scope);
   }
@@ -97,15 +120,20 @@ struct S_class : public S_type {
       for(S_type *i : interfaces)
 	printed += i->name + " ";
     }
+    //for (semantics * fld : fields)
+    //  printed += " Field: " + fld->to_string() + " ";
     return printed;
   }
 
   // S_type is used in the following two fields because they might
   // be undefined during pass 1.  --aerc 10/24/2019
   S_type * parentClass;  // extends.
+  vector<S_class *> inheritedClasses;
   vector<S_type *> interfaces; // implements.
   vector<semantics *> fields;  // each has to be S_function or S_variable
   virtual void replace_undefined(Symtab *scope) {
+    if (marked.count(this)) return;
+    marked.insert(this);
     if (parentClass and parentClass->is_undefined()) {
       S_type *type = get_real_type(parentClass->name, line, scope);
       S_class *cl = dynamic_cast<S_class *>(type);
@@ -144,6 +172,8 @@ struct S_arraytype : public S_type {
   S_type *element_type;  // I'm an array of this type.
   virtual string to_string() { return "S_arraytype(" + element_type->to_string() + ")"; }
   virtual void replace_undefined(Symtab *scope) {
+    if (marked.count(this)) return;
+    marked.insert(this);
     if (element_type->is_undefined())
       element_type = get_real_type(element_type->name, line, scope);
     else

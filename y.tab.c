@@ -549,21 +549,21 @@ static const yytype_uint16 yyrline[] =
        0,    87,    87,    89,    90,    91,    91,    91,    91,    94,
      105,   106,   133,   134,   136,   137,   140,   147,   155,   140,
      175,   182,   190,   175,   210,   211,   212,   213,   214,   215,
-     216,   217,   218,   219,   223,   224,   239,   249,   239,   260,
-     270,   260,   280,   281,   282,   283,   286,   286,   289,   290,
-     291,   292,   293,   294,   295,   296,   297,   297,   298,   298,
-     298,   298,   299,   299,   300,   300,   300,   303,   304,   305,
-     308,   311,   312,   313,   316,   318,   319,   321,   324,   325,
-     326,   327,   328,   329,   330,   331,   332,   333,   334,   335,
-     336,   337,   338,   339,   340,   341,   342,   343,   344,   345,
-     346,   347,   348,   349,   351,   351,   351,   351,   352,   353,
-     354,   355,   356,   359,   359,   359,   359,   359,   360,   360,
-     360,   361,   362,   363,   364,   365,   366,   367,   368,   371,
-     371,   372,   373,   374,   376,   378,   380,   382,   384,   398,
-     406,   407,   408,   409,   410,   411,   412,   413,   414,   415,
-     416,   417,   418,   419,   420,   421,   424,   425,   426,   427,
-     428,   429,   430,   431,   432,   433,   434,   435,   436,   437,
-     438
+     216,   217,   218,   219,   223,   224,   239,   253,   239,   264,
+     274,   264,   284,   285,   286,   287,   290,   290,   293,   294,
+     295,   296,   297,   298,   299,   300,   301,   301,   302,   302,
+     302,   302,   303,   303,   304,   304,   304,   307,   308,   309,
+     312,   315,   316,   317,   320,   322,   323,   325,   328,   329,
+     330,   331,   332,   333,   334,   335,   336,   337,   338,   339,
+     340,   341,   342,   343,   344,   345,   346,   347,   348,   349,
+     350,   351,   352,   353,   355,   355,   355,   355,   356,   357,
+     358,   359,   360,   363,   363,   363,   363,   363,   364,   364,
+     364,   365,   366,   367,   368,   369,   370,   371,   372,   375,
+     376,   390,   391,   392,   394,   396,   398,   400,   402,   416,
+     424,   426,   428,   430,   432,   434,   436,   438,   440,   441,
+     442,   443,   444,   445,   446,   447,   450,   451,   452,   453,
+     454,   455,   456,   457,   458,   459,   460,   461,   462,   463,
+     464
 };
 #endif
 
@@ -1826,34 +1826,38 @@ yyreduce:
                     semantics *curr = currentScope->local_lookup(func_name);
                     if (curr) semantic_error("Function already defined",tok->line);
                     S_type *var_type = dynamic_cast<S_type *>((yyvsp[-2])->sem);
+                    //string var_type_name = $1->children[0]->token->text;
+                    //var_type->name = var_type_name;
+                    //Maybe look here HERE WOOLSON
+                    //cerr << endl << endl << "THIS IS TESTING LINE 247" << var_type_name << endl << endl;
                     currentFunction->name = func_name;
                     currentFunction->returnType = var_type;
                 }
-#line 1833 "y.tab.c" /* yacc.c:1646  */
+#line 1837 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 249 "decaf.y" /* yacc.c:1646  */
+#line 253 "decaf.y" /* yacc.c:1646  */
     { for(ParseTree *f_tree : (yyvsp[0])->children){
                         S_variable * this_formal = dynamic_cast<S_variable *>(f_tree->sem);
                         currentFunction->formals.push_back(this_formal);
                     }
                 }
-#line 1843 "y.tab.c" /* yacc.c:1646  */
+#line 1847 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 254 "decaf.y" /* yacc.c:1646  */
+#line 258 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("functiondecl", (yyvsp[-7]), (yyvsp[-6]), (yyvsp[-3]), (yyvsp[0]));
                     currentScope->insert(currentFunction->name, currentFunction);
                     all_decls.push_back(currentFunction);
                     (yyval)->sem = currentFunction;
                     currentFunction = nullptr; }
-#line 1853 "y.tab.c" /* yacc.c:1646  */
+#line 1857 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 260 "decaf.y" /* yacc.c:1646  */
+#line 264 "decaf.y" /* yacc.c:1646  */
     {
                         currentFunction = new S_function;
                         Token *tok = (yyvsp[-1])->token;
@@ -1864,360 +1868,379 @@ yyreduce:
                         currentFunction->name = func_name;
                         currentFunction->returnType = NULL;
                     }
-#line 1868 "y.tab.c" /* yacc.c:1646  */
+#line 1872 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 270 "decaf.y" /* yacc.c:1646  */
+#line 274 "decaf.y" /* yacc.c:1646  */
     { for(ParseTree *f_tree : (yyvsp[0])->children){
                             S_variable * this_formal = dynamic_cast<S_variable *>(f_tree->sem);
                             currentFunction->formals.push_back(this_formal);
                         }
                     }
-#line 1878 "y.tab.c" /* yacc.c:1646  */
+#line 1882 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 275 "decaf.y" /* yacc.c:1646  */
+#line 279 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("functiondecl", (yyvsp[-7]), (yyvsp[-6]), (yyvsp[-3]), (yyvsp[0]));
                         currentScope->insert(currentFunction->name, currentFunction);
                         all_decls.push_back(currentFunction);
                         (yyval)->sem = currentFunction;
                         currentFunction = nullptr; }
-#line 1888 "y.tab.c" /* yacc.c:1646  */
+#line 1892 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 280 "decaf.y" /* yacc.c:1646  */
+#line 284 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("formals"); }
-#line 1894 "y.tab.c" /* yacc.c:1646  */
+#line 1898 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 282 "decaf.y" /* yacc.c:1646  */
+#line 286 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("formals", (yyvsp[0])); }
-#line 1900 "y.tab.c" /* yacc.c:1646  */
+#line 1904 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 283 "decaf.y" /* yacc.c:1646  */
+#line 287 "decaf.y" /* yacc.c:1646  */
     { (yyvsp[-2])->addChild((yyvsp[0])); }
-#line 1906 "y.tab.c" /* yacc.c:1646  */
+#line 1910 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 286 "decaf.y" /* yacc.c:1646  */
+#line 290 "decaf.y" /* yacc.c:1646  */
     { openscope(); }
-#line 1912 "y.tab.c" /* yacc.c:1646  */
+#line 1916 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 287 "decaf.y" /* yacc.c:1646  */
+#line 291 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("stmtblock", (yyvsp[-2]), (yyvsp[-1]));
                                         (yyval)->symtab = closescope(); }
-#line 1919 "y.tab.c" /* yacc.c:1646  */
+#line 1923 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 289 "decaf.y" /* yacc.c:1646  */
+#line 293 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("vardecls"); }
-#line 1925 "y.tab.c" /* yacc.c:1646  */
+#line 1929 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 291 "decaf.y" /* yacc.c:1646  */
+#line 295 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("vardecls", (yyvsp[0])); }
-#line 1931 "y.tab.c" /* yacc.c:1646  */
+#line 1935 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 292 "decaf.y" /* yacc.c:1646  */
+#line 296 "decaf.y" /* yacc.c:1646  */
     { (yyvsp[-1])->addChild((yyvsp[0])); }
-#line 1937 "y.tab.c" /* yacc.c:1646  */
+#line 1941 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 293 "decaf.y" /* yacc.c:1646  */
+#line 297 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("stmts"); }
-#line 1943 "y.tab.c" /* yacc.c:1646  */
+#line 1947 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 295 "decaf.y" /* yacc.c:1646  */
+#line 299 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("stmts", (yyvsp[0])); }
-#line 1949 "y.tab.c" /* yacc.c:1646  */
+#line 1953 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 296 "decaf.y" /* yacc.c:1646  */
+#line 300 "decaf.y" /* yacc.c:1646  */
     { (yyvsp[-1])->addChild((yyvsp[0])); }
-#line 1955 "y.tab.c" /* yacc.c:1646  */
+#line 1959 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 303 "decaf.y" /* yacc.c:1646  */
+#line 307 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("if", (yyvsp[-4]), (yyvsp[-2]), (yyvsp[0])); }
-#line 1961 "y.tab.c" /* yacc.c:1646  */
+#line 1965 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 304 "decaf.y" /* yacc.c:1646  */
+#line 308 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("if", (yyvsp[-2]), (yyvsp[0])); }
-#line 1967 "y.tab.c" /* yacc.c:1646  */
+#line 1971 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 305 "decaf.y" /* yacc.c:1646  */
+#line 309 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("if", (yyvsp[-4]), (yyvsp[-2]), (yyvsp[0])); }
-#line 1973 "y.tab.c" /* yacc.c:1646  */
+#line 1977 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 308 "decaf.y" /* yacc.c:1646  */
+#line 312 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("while", (yyvsp[-2]), (yyvsp[0])); }
-#line 1979 "y.tab.c" /* yacc.c:1646  */
+#line 1983 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 311 "decaf.y" /* yacc.c:1646  */
+#line 315 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("for", (yyvsp[-6]), (yyvsp[-4]), (yyvsp[-2]), (yyvsp[0])); }
-#line 1985 "y.tab.c" /* yacc.c:1646  */
+#line 1989 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 72:
+#line 316 "decaf.y" /* yacc.c:1646  */
+    { (yyval) = nullptr; }
+#line 1995 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 316 "decaf.y" /* yacc.c:1646  */
+#line 320 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("break", (yyvsp[-1])); }
-#line 1991 "y.tab.c" /* yacc.c:1646  */
+#line 2001 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 75:
-#line 318 "decaf.y" /* yacc.c:1646  */
+#line 322 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("return", (yyvsp[-1])); }
-#line 1997 "y.tab.c" /* yacc.c:1646  */
+#line 2007 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 76:
-#line 319 "decaf.y" /* yacc.c:1646  */
+#line 323 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("return", (yyvsp[-2]), (yyvsp[-1])); }
-#line 2003 "y.tab.c" /* yacc.c:1646  */
+#line 2013 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 77:
-#line 321 "decaf.y" /* yacc.c:1646  */
+#line 325 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("print", (yyvsp[-4]), (yyvsp[-2])); }
-#line 2009 "y.tab.c" /* yacc.c:1646  */
+#line 2019 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 78:
-#line 324 "decaf.y" /* yacc.c:1646  */
+#line 328 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("nullstmt"); }
-#line 2015 "y.tab.c" /* yacc.c:1646  */
+#line 2025 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 80:
-#line 326 "decaf.y" /* yacc.c:1646  */
+#line 330 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("binop", (yyvsp[-2]), (yyvsp[-1]), (yyvsp[0])); }
-#line 2021 "y.tab.c" /* yacc.c:1646  */
+#line 2031 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 82:
-#line 328 "decaf.y" /* yacc.c:1646  */
+#line 332 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("binop", (yyvsp[-2]), (yyvsp[-1]), (yyvsp[0])); }
-#line 2027 "y.tab.c" /* yacc.c:1646  */
+#line 2037 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 84:
-#line 330 "decaf.y" /* yacc.c:1646  */
+#line 334 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("binop", (yyvsp[-2]), (yyvsp[-1]), (yyvsp[0])); }
-#line 2033 "y.tab.c" /* yacc.c:1646  */
+#line 2043 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 86:
-#line 332 "decaf.y" /* yacc.c:1646  */
+#line 336 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("binop", (yyvsp[-2]), (yyvsp[-1]), (yyvsp[0])); }
-#line 2039 "y.tab.c" /* yacc.c:1646  */
+#line 2049 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 87:
-#line 333 "decaf.y" /* yacc.c:1646  */
+#line 337 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("binop", (yyvsp[-2]), (yyvsp[-1]), (yyvsp[0])); }
-#line 2045 "y.tab.c" /* yacc.c:1646  */
+#line 2055 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 89:
-#line 335 "decaf.y" /* yacc.c:1646  */
+#line 339 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("binop", (yyvsp[-2]), (yyvsp[-1]), (yyvsp[0])); }
-#line 2051 "y.tab.c" /* yacc.c:1646  */
+#line 2061 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 90:
-#line 336 "decaf.y" /* yacc.c:1646  */
+#line 340 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("binop", (yyvsp[-2]), (yyvsp[-1]), (yyvsp[0])); }
-#line 2057 "y.tab.c" /* yacc.c:1646  */
+#line 2067 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 91:
-#line 337 "decaf.y" /* yacc.c:1646  */
+#line 341 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("binop", (yyvsp[-2]), (yyvsp[-1]), (yyvsp[0])); }
-#line 2063 "y.tab.c" /* yacc.c:1646  */
+#line 2073 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 92:
-#line 338 "decaf.y" /* yacc.c:1646  */
+#line 342 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("binop", (yyvsp[-2]), (yyvsp[-1]), (yyvsp[0])); }
-#line 2069 "y.tab.c" /* yacc.c:1646  */
+#line 2079 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 94:
-#line 340 "decaf.y" /* yacc.c:1646  */
+#line 344 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("binop", (yyvsp[-2]), (yyvsp[-1]), (yyvsp[0])); }
-#line 2075 "y.tab.c" /* yacc.c:1646  */
+#line 2085 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 95:
-#line 341 "decaf.y" /* yacc.c:1646  */
+#line 345 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("binop", (yyvsp[-2]), (yyvsp[-1]), (yyvsp[0])); }
-#line 2081 "y.tab.c" /* yacc.c:1646  */
+#line 2091 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 97:
-#line 343 "decaf.y" /* yacc.c:1646  */
+#line 347 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("binop", (yyvsp[-2]), (yyvsp[-1]), (yyvsp[0])); }
-#line 2087 "y.tab.c" /* yacc.c:1646  */
+#line 2097 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 98:
-#line 344 "decaf.y" /* yacc.c:1646  */
+#line 348 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("binop", (yyvsp[-2]), (yyvsp[-1]), (yyvsp[0])); }
-#line 2093 "y.tab.c" /* yacc.c:1646  */
+#line 2103 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 99:
-#line 345 "decaf.y" /* yacc.c:1646  */
+#line 349 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("binop", (yyvsp[-2]), (yyvsp[-1]), (yyvsp[0])); }
-#line 2099 "y.tab.c" /* yacc.c:1646  */
+#line 2109 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 101:
-#line 347 "decaf.y" /* yacc.c:1646  */
+#line 351 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("uop", (yyvsp[-1]), (yyvsp[0])); }
-#line 2105 "y.tab.c" /* yacc.c:1646  */
+#line 2115 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 102:
-#line 348 "decaf.y" /* yacc.c:1646  */
+#line 352 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("uop", (yyvsp[-1]), (yyvsp[0])); }
-#line 2111 "y.tab.c" /* yacc.c:1646  */
+#line 2121 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 108:
-#line 352 "decaf.y" /* yacc.c:1646  */
+#line 356 "decaf.y" /* yacc.c:1646  */
     { (yyval) = (yyvsp[-1]); }
-#line 2117 "y.tab.c" /* yacc.c:1646  */
+#line 2127 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 109:
-#line 353 "decaf.y" /* yacc.c:1646  */
+#line 357 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("readinteger"); }
-#line 2123 "y.tab.c" /* yacc.c:1646  */
+#line 2133 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 110:
-#line 354 "decaf.y" /* yacc.c:1646  */
+#line 358 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("readline"); }
-#line 2129 "y.tab.c" /* yacc.c:1646  */
+#line 2139 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 111:
-#line 355 "decaf.y" /* yacc.c:1646  */
+#line 359 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("new", (yyvsp[-1])); }
-#line 2135 "y.tab.c" /* yacc.c:1646  */
+#line 2145 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 112:
-#line 356 "decaf.y" /* yacc.c:1646  */
+#line 360 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("newarray", (yyvsp[-3]), (yyvsp[-1])); }
-#line 2141 "y.tab.c" /* yacc.c:1646  */
+#line 2151 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 121:
-#line 361 "decaf.y" /* yacc.c:1646  */
+#line 365 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("field_access", (yyvsp[-2]), (yyvsp[0])); }
-#line 2147 "y.tab.c" /* yacc.c:1646  */
+#line 2157 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 122:
-#line 362 "decaf.y" /* yacc.c:1646  */
+#line 366 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("aref", (yyvsp[-3]), (yyvsp[-1])); }
-#line 2153 "y.tab.c" /* yacc.c:1646  */
+#line 2163 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 123:
-#line 363 "decaf.y" /* yacc.c:1646  */
+#line 367 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("call", (yyvsp[-3]), (yyvsp[-1])); }
-#line 2159 "y.tab.c" /* yacc.c:1646  */
+#line 2169 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 124:
-#line 364 "decaf.y" /* yacc.c:1646  */
+#line 368 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("call", (yyvsp[-3]), (yyvsp[-1])); }
-#line 2165 "y.tab.c" /* yacc.c:1646  */
+#line 2175 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 125:
-#line 365 "decaf.y" /* yacc.c:1646  */
+#line 369 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("actuals"); }
-#line 2171 "y.tab.c" /* yacc.c:1646  */
+#line 2181 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 127:
-#line 367 "decaf.y" /* yacc.c:1646  */
+#line 371 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("actuals", (yyvsp[0])); }
-#line 2177 "y.tab.c" /* yacc.c:1646  */
+#line 2187 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 128:
-#line 368 "decaf.y" /* yacc.c:1646  */
+#line 372 "decaf.y" /* yacc.c:1646  */
     { (yyvsp[-2])->addChild((yyvsp[0])); }
-#line 2183 "y.tab.c" /* yacc.c:1646  */
+#line 2193 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 130:
-#line 371 "decaf.y" /* yacc.c:1646  */
-    { (yyval) = new ParseTree("usertype", (yyvsp[0])); }
-#line 2189 "y.tab.c" /* yacc.c:1646  */
+#line 376 "decaf.y" /* yacc.c:1646  */
+    { (yyval) = new ParseTree("usertype", (yyvsp[0]));
+                string type_name = (yyvsp[0])->token->text;
+                semantics *thing = topScope->lookup(type_name);
+            if (thing == nullptr) {
+                S_type *undef_type = new S_undefined;
+                undef_type->name = type_name;
+                undef_type->line = yylineno;
+                (yyval)->sem = undef_type;
+            }
+            else if (dynamic_cast<S_type *>(thing))
+                (yyval)->sem = thing;
+            else
+                semantic_error(type_name + " is not a type",
+                     (yyvsp[0])->token->line); }
+#line 2212 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 134:
-#line 376 "decaf.y" /* yacc.c:1646  */
+#line 394 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("primtype", (yyvsp[0]));
                   (yyval)->sem = topScope->lookup("int"); }
-#line 2196 "y.tab.c" /* yacc.c:1646  */
+#line 2219 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 135:
-#line 378 "decaf.y" /* yacc.c:1646  */
+#line 396 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("primtype", (yyvsp[0]));
                      (yyval)->sem = topScope->lookup("double"); }
-#line 2203 "y.tab.c" /* yacc.c:1646  */
+#line 2226 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 136:
-#line 380 "decaf.y" /* yacc.c:1646  */
+#line 398 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("primtype", (yyvsp[0]));
                    (yyval)->sem = topScope->lookup("bool"); }
-#line 2210 "y.tab.c" /* yacc.c:1646  */
+#line 2233 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 137:
-#line 382 "decaf.y" /* yacc.c:1646  */
+#line 400 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("primtype", (yyvsp[0]));
                      (yyval)->sem = topScope->lookup("string"); }
-#line 2217 "y.tab.c" /* yacc.c:1646  */
+#line 2240 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 138:
-#line 384 "decaf.y" /* yacc.c:1646  */
+#line 402 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree("usertype", (yyvsp[0]));
             string type_name = (yyvsp[0])->token->text;
             semantics *thing = topScope->lookup(type_name);
@@ -2232,208 +2255,216 @@ yyreduce:
         else
             semantic_error(type_name + " is not a type",
                  (yyvsp[0])->token->line); }
-#line 2236 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 139:
-#line 398 "decaf.y" /* yacc.c:1646  */
-    { (yyval) = new ParseTree("arraytype", (yyvsp[-2]));
-            S_arraytype *this_type = new S_arraytype;
-            this_type->element_type = dynamic_cast<S_type *>((yyvsp[-2])->children[0]->sem);
-            this_type->line = yylineno;
-            (yyval)->sem = this_type;
-        }
-#line 2247 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 140:
-#line 406 "decaf.y" /* yacc.c:1646  */
-    { (yyval) = new ParseTree(myTok); }
-#line 2253 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 141:
-#line 407 "decaf.y" /* yacc.c:1646  */
-    { (yyval) = new ParseTree(myTok); }
 #line 2259 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 142:
-#line 408 "decaf.y" /* yacc.c:1646  */
-    { (yyval) = new ParseTree(myTok); }
-#line 2265 "y.tab.c" /* yacc.c:1646  */
+  case 139:
+#line 416 "decaf.y" /* yacc.c:1646  */
+    { (yyval) = new ParseTree("arraytype", (yyvsp[-2]));
+            S_arraytype *this_type = new S_arraytype;
+            this_type->element_type = dynamic_cast<S_type *>((yyvsp[-2])->sem);
+            this_type->line = yylineno;
+            (yyval)->sem = this_type;
+        }
+#line 2270 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 143:
-#line 409 "decaf.y" /* yacc.c:1646  */
-    { (yyval) = new ParseTree(myTok); }
-#line 2271 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 144:
-#line 410 "decaf.y" /* yacc.c:1646  */
-    { (yyval) = new ParseTree(myTok); }
+  case 140:
+#line 424 "decaf.y" /* yacc.c:1646  */
+    { (yyval) = new ParseTree(myTok);
+                                (yyval)->sem = topScope->lookup("int"); }
 #line 2277 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 141:
+#line 426 "decaf.y" /* yacc.c:1646  */
+    { (yyval) = new ParseTree(myTok);
+                                (yyval)->sem = topScope->lookup("double"); }
+#line 2284 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 142:
+#line 428 "decaf.y" /* yacc.c:1646  */
+    { (yyval) = new ParseTree(myTok);
+                                (yyval)->sem = topScope->lookup("bool"); }
+#line 2291 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 143:
+#line 430 "decaf.y" /* yacc.c:1646  */
+    { (yyval) = new ParseTree(myTok);
+                                (yyval)->sem = topScope->lookup("string");}
+#line 2298 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 144:
+#line 432 "decaf.y" /* yacc.c:1646  */
+    { (yyval) = new ParseTree(myTok);
+                (yyval)->sem = topScope->lookup("int");}
+#line 2305 "y.tab.c" /* yacc.c:1646  */
+    break;
+
   case 145:
-#line 411 "decaf.y" /* yacc.c:1646  */
-    { (yyval) = new ParseTree(myTok); }
-#line 2283 "y.tab.c" /* yacc.c:1646  */
+#line 434 "decaf.y" /* yacc.c:1646  */
+    { (yyval) = new ParseTree(myTok);
+                (yyval)->sem = topScope->lookup("double");}
+#line 2312 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 146:
-#line 412 "decaf.y" /* yacc.c:1646  */
-    { (yyval) = new ParseTree(myTok); }
-#line 2289 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 147:
-#line 413 "decaf.y" /* yacc.c:1646  */
-    { (yyval) = new ParseTree(myTok); }
-#line 2295 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 148:
-#line 414 "decaf.y" /* yacc.c:1646  */
-    { (yyval) = new ParseTree(myTok); }
-#line 2301 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 149:
-#line 415 "decaf.y" /* yacc.c:1646  */
-    { (yyval) = new ParseTree(myTok); }
-#line 2307 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 150:
-#line 416 "decaf.y" /* yacc.c:1646  */
-    { (yyval) = new ParseTree(myTok); }
-#line 2313 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 151:
-#line 417 "decaf.y" /* yacc.c:1646  */
-    { (yyval) = new ParseTree(myTok); }
+#line 436 "decaf.y" /* yacc.c:1646  */
+    { (yyval) = new ParseTree(myTok);
+                (yyval)->sem = topScope->lookup("bool");}
 #line 2319 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 152:
-#line 418 "decaf.y" /* yacc.c:1646  */
+  case 147:
+#line 438 "decaf.y" /* yacc.c:1646  */
+    { (yyval) = new ParseTree(myTok);
+                (yyval)->sem = topScope->lookup("string"); }
+#line 2326 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 148:
+#line 440 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree(myTok); }
-#line 2325 "y.tab.c" /* yacc.c:1646  */
+#line 2332 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 149:
+#line 441 "decaf.y" /* yacc.c:1646  */
+    { (yyval) = new ParseTree(myTok); }
+#line 2338 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 150:
+#line 442 "decaf.y" /* yacc.c:1646  */
+    { (yyval) = new ParseTree(myTok); }
+#line 2344 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 151:
+#line 443 "decaf.y" /* yacc.c:1646  */
+    { (yyval) = new ParseTree(myTok); }
+#line 2350 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 152:
+#line 444 "decaf.y" /* yacc.c:1646  */
+    { (yyval) = new ParseTree(myTok); }
+#line 2356 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 153:
-#line 419 "decaf.y" /* yacc.c:1646  */
+#line 445 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree(myTok); }
-#line 2331 "y.tab.c" /* yacc.c:1646  */
+#line 2362 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 154:
-#line 420 "decaf.y" /* yacc.c:1646  */
+#line 446 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree(myTok); }
-#line 2337 "y.tab.c" /* yacc.c:1646  */
+#line 2368 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 155:
-#line 421 "decaf.y" /* yacc.c:1646  */
+#line 447 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree(myTok); }
-#line 2343 "y.tab.c" /* yacc.c:1646  */
+#line 2374 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 156:
-#line 424 "decaf.y" /* yacc.c:1646  */
+#line 450 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree(myTok); }
-#line 2349 "y.tab.c" /* yacc.c:1646  */
+#line 2380 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 157:
-#line 425 "decaf.y" /* yacc.c:1646  */
+#line 451 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree(myTok); }
-#line 2355 "y.tab.c" /* yacc.c:1646  */
+#line 2386 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 158:
-#line 426 "decaf.y" /* yacc.c:1646  */
+#line 452 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree(myTok); }
-#line 2361 "y.tab.c" /* yacc.c:1646  */
+#line 2392 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 159:
-#line 427 "decaf.y" /* yacc.c:1646  */
+#line 453 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree(myTok); }
-#line 2367 "y.tab.c" /* yacc.c:1646  */
+#line 2398 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 160:
-#line 428 "decaf.y" /* yacc.c:1646  */
+#line 454 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree(myTok); }
-#line 2373 "y.tab.c" /* yacc.c:1646  */
+#line 2404 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 161:
-#line 429 "decaf.y" /* yacc.c:1646  */
+#line 455 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree(myTok); }
-#line 2379 "y.tab.c" /* yacc.c:1646  */
+#line 2410 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 162:
-#line 430 "decaf.y" /* yacc.c:1646  */
+#line 456 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree(myTok); }
-#line 2385 "y.tab.c" /* yacc.c:1646  */
+#line 2416 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 163:
-#line 431 "decaf.y" /* yacc.c:1646  */
+#line 457 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree(myTok); }
-#line 2391 "y.tab.c" /* yacc.c:1646  */
+#line 2422 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 164:
-#line 432 "decaf.y" /* yacc.c:1646  */
+#line 458 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree(myTok); }
-#line 2397 "y.tab.c" /* yacc.c:1646  */
+#line 2428 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 165:
-#line 433 "decaf.y" /* yacc.c:1646  */
+#line 459 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree(myTok); }
-#line 2403 "y.tab.c" /* yacc.c:1646  */
+#line 2434 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 166:
-#line 434 "decaf.y" /* yacc.c:1646  */
+#line 460 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree(myTok); }
-#line 2409 "y.tab.c" /* yacc.c:1646  */
+#line 2440 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 167:
-#line 435 "decaf.y" /* yacc.c:1646  */
+#line 461 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree(myTok); }
-#line 2415 "y.tab.c" /* yacc.c:1646  */
+#line 2446 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 168:
-#line 436 "decaf.y" /* yacc.c:1646  */
+#line 462 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree(myTok); }
-#line 2421 "y.tab.c" /* yacc.c:1646  */
+#line 2452 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 169:
-#line 437 "decaf.y" /* yacc.c:1646  */
+#line 463 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree(myTok); }
-#line 2427 "y.tab.c" /* yacc.c:1646  */
+#line 2458 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 170:
-#line 438 "decaf.y" /* yacc.c:1646  */
+#line 464 "decaf.y" /* yacc.c:1646  */
     { (yyval) = new ParseTree(myTok); }
-#line 2433 "y.tab.c" /* yacc.c:1646  */
+#line 2464 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2437 "y.tab.c" /* yacc.c:1646  */
+#line 2468 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2661,7 +2692,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 440 "decaf.y" /* yacc.c:1906  */
+#line 466 "decaf.y" /* yacc.c:1906  */
 
 
 int yyerror(const char * s)

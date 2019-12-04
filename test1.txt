@@ -1,0 +1,10 @@
+int fib(string a, bool b){
+    return 3;
+}
+
+void main(){
+    string a;
+    bool b;
+    a = b;
+    fib(a, b);
+}

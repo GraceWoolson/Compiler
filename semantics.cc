@@ -9,6 +9,9 @@ using namespace std;
 #include "semantics.h"
 #include "parsetree.h"
 
+int Symtab::next_serial;
+
+
 Symtab *topScope = nullptr;
 Symtab *currentScope = nullptr;
 S_interface* currentInterface = nullptr;
@@ -16,7 +19,7 @@ S_class* currentClass = nullptr;
 S_function* currentFunction = nullptr;
 int currentSeq = 0;  // local variable counter
 vector<semantics *> all_decls;  // during pass1, all declarations:  variables, functions, classes, interfaces.
-
+set<semantics *> marked;
 
 
 void semantic_error(string msg, int line)
@@ -34,8 +37,8 @@ void internal_error(string msg)
 S_type *lookup_or_make_undefined_type(string type_name)
 {
   /* Search topScope for semantics for type_name.  If not found at all,
-     create an undefined type. If found and evaluates to a type, 
-     return that.  If found and does not evaluate to a type, signal a 
+     create an undefined type. If found and evaluates to a type,
+     return that.  If found and does not evaluate to a type, signal a
      semantic error. */
   semantics *thing = topScope->lookup(type_name);
   if (thing == nullptr) {
@@ -44,13 +47,15 @@ S_type *lookup_or_make_undefined_type(string type_name)
     undef_type->line = yylineno;
     return undef_type;
   }
-  else if (dynamic_cast<S_type *>(thing)) 
+  else if (dynamic_cast<S_type *>(thing))
     return dynamic_cast<S_type *>(thing);
   else
     semantic_error(type_name + " is not a type", yylineno);
+  // can't get here
+  return nullptr;
 }
 
-S_type *get_real_type(string n, int line, Symtab *scope)  
+S_type *get_real_type(string n, int line, Symtab *scope)
 {
   semantics *thing = scope->local_lookup(n);
   if (!thing)
@@ -71,7 +76,7 @@ int get_line(ParseTree *tree)
     return tree->token->line;
   return get_line(tree->children[0]);
 }
-/* 
+/*
 string base_type_name(ParseTree *type_tree)
 {
   if (type_tree->description=="array")
@@ -101,7 +106,7 @@ bool is_primitive(string type_name)
 //   semantics *definition = topScope->local_lookup(base_name);
 //   if (definition and dynamic_cast<S_type *>(definition))  // dyn_cast is null on fail.
 //     return;
-//   if (definition) 
+//   if (definition)
 //     semantic_error("Type " + base_name + " is not a type.", get_line(type_tree));
 //   if (create_undefined) {
 //     S_type *new_type = new S_type();
@@ -113,17 +118,23 @@ bool is_primitive(string type_name)
 // }
 
 
-Symtab::Symtab(Symtab *p) : parent(p) {}
+Symtab::Symtab(Symtab *p) : parent(p) { serial = next_serial++; }
 
-semantics * Symtab::lookup(string key) { 
+semantics * Symtab::lookup(string key) {
   semantics *answer;
-  return 
-    (answer = local_lookup(key)) ? answer : 
+  return
+    (answer = local_lookup(key)) ? answer :
     parent ? parent->lookup(key) : nullptr;
 
 }
 
-semantics * Symtab::local_lookup(string key) { 
+void Symtab::ensure_undefined(string key, int line)
+{
+  if (dict[key] != nullptr)
+    semantic_error("Redefinition of " + key, line);
+}
+
+semantics * Symtab::local_lookup(string key) {
   return dict[key];
 }
 
@@ -138,9 +149,10 @@ void Symtab::replace(string key, semantics * item) {
 
 string Symtab::to_string() {
   std::stringstream buf;
-  buf << this;
-  if (this->parent)
-    buf << "<-" << this->parent;
+  buf << "Scope ";
+  buf << serial;
+  if (parent)
+    buf << "->" + parent->to_string();
   return buf.str();
 }
 
@@ -155,4 +167,3 @@ Symtab *closescope()
   currentScope = currentScope->parent;
   return v;
 }
-

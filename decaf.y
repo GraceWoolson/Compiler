@@ -243,6 +243,10 @@ FunctionDecl: Type Y_Identifier T_LParen {
                     semantics *curr = currentScope->local_lookup(func_name);
                     if (curr) semantic_error("Function already defined",tok->line);
                     S_type *var_type = dynamic_cast<S_type *>($1->sem);
+                    //string var_type_name = $1->children[0]->token->text;
+                    //var_type->name = var_type_name;
+                    //Maybe look here HERE WOOLSON
+                    //cerr << endl << endl << "THIS IS TESTING LINE 247" << var_type_name << endl << endl;
                     currentFunction->name = func_name;
                     currentFunction->returnType = var_type;
                 }
@@ -309,7 +313,7 @@ WhileStmt: T_While T_LParen Expr T_RParen StmtBlock { $$ = new ParseTree("while"
 
   /* inconsistent output (NULL instead of nullstmt) */
 ForStmt: T_For T_LParen ForExprq T_Semicolon Expr T_Semicolon ForExprq T_RParen Stmt { $$ = new ParseTree("for", $3, $5, $7, $9); }
-ForExprq:
+ForExprq: { $$ = nullptr; }
     | Expr
 
   /* inconsistent output */
@@ -368,7 +372,21 @@ Actuals: Expr { $$ = new ParseTree("actuals", $1); }
     | Actuals T_Comma Expr { $1->addChild($3); }
 
   /* types! */
-NewArrayType: Type | Y_Identifier { $$ = new ParseTree("usertype", $1); }
+NewArrayType: Type
+    | Y_Identifier { $$ = new ParseTree("usertype", $1);
+                string type_name = $1->token->text;
+                semantics *thing = topScope->lookup(type_name);
+            if (thing == nullptr) {
+                S_type *undef_type = new S_undefined;
+                undef_type->name = type_name;
+                undef_type->line = yylineno;
+                $$->sem = undef_type;
+            }
+            else if (dynamic_cast<S_type *>(thing))
+                $$->sem = thing;
+            else
+                semantic_error(type_name + " is not a type",
+                     $1->token->line); }
 Type: Primtype
     | Usertype
     | Lsttype
@@ -397,20 +415,28 @@ Usertype: Y_TypeIdentifier { $$ = new ParseTree("usertype", $1);
                  $1->token->line); }
 Lsttype: Type T_LBracket T_RBracket { $$ = new ParseTree("arraytype", $1);
             S_arraytype *this_type = new S_arraytype;
-            this_type->element_type = dynamic_cast<S_type *>($1->children[0]->sem);
+            this_type->element_type = dynamic_cast<S_type *>($1->sem);
             this_type->line = yylineno;
             $$->sem = this_type;
         }
 
   /* terminals */
-Y_IntConstant: T_IntConstant { $$ = new ParseTree(myTok); }
-Y_DoubleConstant: T_DoubleConstant { $$ = new ParseTree(myTok); }
-Y_BoolConstant: T_BoolConstant { $$ = new ParseTree(myTok); }
-Y_StringConstant: T_StringConstant { $$ = new ParseTree(myTok); }
-Y_Int: T_Int { $$ = new ParseTree(myTok); }
-Y_Double: T_Double { $$ = new ParseTree(myTok); }
-Y_Bool: T_Bool { $$ = new ParseTree(myTok); }
-Y_String: T_String { $$ = new ParseTree(myTok); }
+Y_IntConstant: T_IntConstant { $$ = new ParseTree(myTok);
+                                $$->sem = topScope->lookup("int"); }
+Y_DoubleConstant: T_DoubleConstant { $$ = new ParseTree(myTok);
+                                $$->sem = topScope->lookup("double"); }
+Y_BoolConstant: T_BoolConstant { $$ = new ParseTree(myTok);
+                                $$->sem = topScope->lookup("bool"); }
+Y_StringConstant: T_StringConstant { $$ = new ParseTree(myTok);
+                                $$->sem = topScope->lookup("string");}
+Y_Int: T_Int { $$ = new ParseTree(myTok);
+                $$->sem = topScope->lookup("int");}
+Y_Double: T_Double { $$ = new ParseTree(myTok);
+                $$->sem = topScope->lookup("double");}
+Y_Bool: T_Bool { $$ = new ParseTree(myTok);
+                $$->sem = topScope->lookup("bool");}
+Y_String: T_String { $$ = new ParseTree(myTok);
+                $$->sem = topScope->lookup("string"); }
 Y_TypeIdentifier: T_TypeIdentifier { $$ = new ParseTree(myTok); }
 Y_Identifier: T_Identifier { $$ = new ParseTree(myTok); }
 Y_This: T_This { $$ = new ParseTree(myTok); }
