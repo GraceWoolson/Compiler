@@ -58,6 +58,8 @@ S_type *lookup_or_make_undefined_type(string type_name);
 
 struct S_variable : public semantics {
   string name;
+  string genus;
+  int seq_num;
   S_type * type;
   virtual string to_string() { return "S_variable(" + name + ": "
                                                     + type->to_string() + ")"; }

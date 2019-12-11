@@ -1,6 +1,7 @@
 //#define Tokens
 
 #include <iostream>
+#include <fstream>
 #include <vector>
 //#include "tokentype.h"
 #include "parsetree.h"
@@ -23,12 +24,454 @@ ParseTree * parse_decaf(FILE *);
 
 //global declarations of pass2 so all functions can call it
 void pass2(ParseTree * current);
+void generating(ParseTree * tree, fstream & file);
 
 int loopcount = 0;
 bool is_in_a_class = false;
 Symtab * scope;
-S_function * currfunc;
+S_function * currfunc = NULL;
 S_class * currclass;
+int curr_varnum = 0;
+
+
+
+
+string cut_extension(string name){
+    string cut = "";
+    bool adding = false;
+    for (int i = name.size(); i >= 0; i--){
+        char letter = name[i];
+        if (adding){
+            cut = letter + cut;
+        }
+        else{
+            if (letter == '.'){
+                adding = true;
+            }
+        }
+    }
+    return cut;
+}
+
+
+
+
+
+char codetype(S_type * type){
+    //can be primtype, arraytype, class, or interface
+    if (type == NULL){
+        return 'V';
+    }
+    S_primtype * ptype = dynamic_cast<S_primtype *>(type);
+    if (ptype){
+        string thetype = ptype->name;
+        char typeletter = thetype[0];
+        typeletter = typeletter - 32;
+        return typeletter;
+    }
+    return 'T';
+}
+
+
+
+//not space efficient
+//MIGHT need to double this in case everything is a double
+int stackneeded(ParseTree * current){
+    if (current->children.size() == 0){
+        return 1;
+    }
+
+    int max_depth = 0;
+    for (ParseTree * child: current->children){
+        int branchdepth = stackneeded(child);
+        if (branchdepth > max_depth){
+            max_depth = branchdepth;
+        }
+    }
+    return 1 + max_depth;
+}
+
+
+int localsneeded(ParseTree * current){
+    S_function * func = dynamic_cast<S_function *>(current->sem);
+    int vars = 0;
+    if (is_in_a_class) {
+        vars += 1;
+    }
+
+    vars += func->formals.size();
+    vars += current->children[3]->children[0]->children.size();
+    return vars * 2;
+}
+
+
+
+
+void generating_functions(ParseTree * current, fstream & file){
+    S_function * func = dynamic_cast<S_function *>(current->sem);
+    file << ".method                  static ";
+    file << func->name << "(";
+
+    for (S_variable * argument : func->formals){
+        cout << codetype(argument->type) << endl;
+    }
+
+    file << ")";
+    file << codetype(func->returnType) << endl;
+
+    file << "   .limit stack          ";
+    file << stackneeded(current->children[3]) << endl;
+
+    file << "   .limit locals         ";
+    file << localsneeded(current) << endl;
+
+    generating(current->children[3], file);
+
+    file << "   return" << endl;
+    file << ".end method" << endl;
+}
+
+
+/*vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv*/
+
+int evaluate_int(ParseTree * current){
+    //how do I handle readint?
+    if(current->children.size() == 0){
+        //only works if not a variable!!
+        return stoi(current->token->text);
+    }
+    int value = 0;
+    if(current->description == "binop"){
+        string op = current->children[1]->token->text;
+        int lval = evaluate_int(current->children[0]);
+        int rval = evaluate_int(current->children[2]);
+
+        if (op == "+"){
+            value = lval + rval;
+        }
+        else if (op == "-"){
+            value = lval - rval;
+        }
+        else if (op == "/"){
+            value = lval / rval;
+        }
+        else if (op == "*"){
+            value = lval * rval;
+        }
+        else if (op == "%"){
+            value = lval % rval;
+        }
+
+    }
+    else if(current->description == "uop"){
+        //negation
+        int absvalue = evaluate_int(current->children[1]);
+        value = value - absvalue;
+    }
+    //cout << value << endl;
+    return value;
+}
+
+
+
+/*^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
+
+
+void generating_print(ParseTree * current, fstream & file){
+    file << "   getstatic             java/lang/System/out Ljava/io/PrintStream;" << endl;
+
+    S_type * printtype = current->children[1]->children[0]->type;
+    S_primtype * ptype = dynamic_cast<S_primtype *>(printtype);
+
+    if (ptype){
+        if (ptype->name == "string"){
+            string output = current->children[1]->children[0]->token->text;
+            file << "   ldc                   " << output << endl;
+            file << "   invokevirtual         java/io/PrintStream/println(Ljava/lang/String;)V" << endl;
+        }
+
+        if (ptype->name == "int"){
+            int value = evaluate_int(current->children[1]->children[0]);
+            if ((value > -1) and (value < 6)){
+                file << "   iconst_" << value << endl;
+            }
+            else{
+                file << "   bipush                " << value << endl;
+            }
+            file << "   invokevirtual         java/io/PrintStream/println(I)V" << endl;
+        }
+        if (ptype->name == "bool"){
+            
+        }
+    }
+}
+
+
+
+void generating_binops(ParseTree * current, fstream & file){
+    if (current->children[1]->token->text == "="){
+
+        S_primtype * ptype = dynamic_cast<S_primtype *>(current->children[2]->);
+
+        if (ptype){
+            if (ptype->name == "string"){
+                string output = current->children[1]->children[0]->token->text;
+                file << "   ldc                   " << output << endl;
+            }
+
+            if (ptype->name == "int"){
+                int value = evaluate_int(current->children[1]->children[0]);
+                if ((value > -1) and (value < 6)){
+                    file << "   iconst_" << value << endl;
+                }
+                else{
+                    file << "   bipush                " << value << endl;
+                }
+                file << "   invokevirtual         java/io/PrintStream/println(I)V" << endl;
+            }
+        }
+
+        S_variable * lvalue = dynamic_cast<S_variable *>(current->children[0]->sem);
+        if(lvalue){
+            cout << lvalue->name << endl;
+        }
+
+    }
+    if (file){
+
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+void generating(ParseTree * current, fstream & file){
+
+    if (current->description == "functiondecl"){
+        //compatible return value
+        generating_functions(current, file);
+    }
+    else if(current->description == "print"){
+        generating_print(current, file);
+    }
+    else if(current->description == "binop"){
+        //only do assign for now
+        generating_binops(current, file);
+    }
+    else{
+        for (ParseTree * child : current->children){
+            generating(child, file);
+        }
+    }
+
+    /*if (current->description.size() == 0){
+        pass2_const_or_var(current);
+    }
+
+    else if (current->description == "return"){
+        pass2_return(current);
+
+    }
+
+    else if (current->description == "binop"){
+        pass2_binop(current);
+    }
+
+    else if (current->description == "class"){
+        //class object valid in class being declared: class A { A a; }
+        //Instance variable lookup is used when scope lookup fails.  Inherited instance variables are found
+        Symtab * oldscope = scope;
+        scope = current->symtab;
+        pass2_class(current);
+        scope = oldscope;
+
+    }
+    else if (current->description == "interface"){
+        Symtab * oldscope = scope;
+        scope = current->symtab;
+        pass2_interface(current);
+        scope = oldscope;
+    }
+
+    //else if (current->description == "extends"){}
+
+    //else if (current->description == "implements"){}
+
+    else if (current->description == "fields"){
+        pass2_fields(current);
+    }
+
+    else if (current->description == "variable"){
+        pass2_variables(current);
+    }
+
+    else if (current->description == "formals"){
+        pass2_formals(current);
+    }
+
+    else if (current->description == "stmtblock"){
+        Symtab * oldscope = scope;
+        scope = current->symtab;
+        pass2_stmtblock(current);
+        scope = oldscope;
+    }
+
+    else if (current->description == "vardecls"){
+        pass2_vardecls(current);
+    }
+
+    else if (current->description == "stmts"){
+        pass2_stmts(current);
+    }
+
+    else if (current->description == "if"){
+        //expr is a bool
+        pass2_ifstmts(current);
+    }
+
+    else if (current->description == "while"){
+        //expr is a bool
+        pass2_whilestmts(current);
+    }
+
+    else if (current->description == "for"){
+        //check the three exprs (looks just like a c++ for loop)
+        pass2_forloops(current);
+
+    }
+
+    else if (current->description == "break"){
+        pass2_break();
+    }
+
+    else if (current->description == "print"){
+        pass2_print(current);
+    }
+
+    //else if (current->description == "nullstmt"){} ** might need to make type null or something
+
+    else if (current->description == "uop"){
+        //type match
+        pass2_uop(current);
+    }
+
+    else if (current->description == "readinteger"){
+        pass2_readint(current);
+    }
+
+    else if (current->description == "new"){
+        //valid parameters
+        pass2_new(current);
+    }
+
+    else if (current->description == "newarray"){
+        //valid parameters
+        pass2_newarray(current);
+    }
+
+    else if (current->description == "field_access"){
+        //valid field access
+        pass2_field_access(current);
+    }
+
+    else if (current->description == "aref"){
+        //type check (integer?)
+        pass2_aref(current);
+    }
+
+    else if (current->description == "call"){
+        //actuals in a function call compatible with declared formal types
+        //class object accepted in place of an interface object when passing actuals
+        //valid/invalid interface object function call
+        pass2_call(current);
+    }
+
+    else if (current->description == "actuals"){
+        pass2_actuals(current);
+    }
+
+    else if (current->description == "usertype"){
+        pass2_type(current);
+    }
+
+    else if (current->description == "primtype"){
+        pass2_type(current);
+    }
+
+    else if (current->description == "arraytype"){
+        pass2_type(current);
+    }
+
+    // else if(current->token){
+    //     if (current->token->text == "this"){
+    //
+    //     }
+    // }
+
+    */
+
+}
+
+
+
+
+
+
+void write_header(string simpname, string filename, fstream & file){
+    file << ".source                  " << filename << endl;
+    file << ".class                   public " << simpname << endl;
+    file << ".super                   java/lang/Object" << endl;
+    file << endl << endl;
+    file << ".method                  public <init>()V" << endl;
+    file << "   .limit stack          1" << endl;
+    file << "   .limit locals         1" << endl;
+    file << "   .line                 1" << endl;
+    file << "   aload_0" << endl;
+    file << "   invokespecial         java/lang/Object/<init>()V" << endl;
+    file << "   return" << endl;
+    file << ".end method" << endl;
+    file << endl;
+}
+
+
+
+
+
+void write_main(string simpname, fstream & file){
+    file << ".method                  public static main([Ljava/lang/String;)V" << endl;
+    file << "   .limit stack          0" << endl;
+    file << "   .limit locals         1" << endl;
+    file << "   invokestatic          " << simpname << "/main()V" << endl;
+    file << "   return" << endl;
+    file << ".end method" << endl << endl;
+}
+
+
+
+void code_generation(string filename){
+    string simpname = cut_extension(filename);
+
+    fstream mainfile;
+    mainfile.open(simpname + ".j", ios::out);
+    if (!mainfile){
+        cout << "Error creating file" << endl;
+        exit(1);
+    }
+
+
+    write_header(simpname, filename, mainfile);
+    write_main(simpname, mainfile);
+    generating(top, mainfile);
+}
+
+
 
 
 
@@ -107,10 +550,9 @@ bool is_compatible(S_type * lhs, S_type * rhs){
 }
 
 
-
+//probably needs to be fixed?
 void pass2_const_or_var(ParseTree * current){
     string text = current->token->text;
-    cout << "const or var " << current->token->text << endl;
     if(text == "this"){
         if (!currclass){
             semantic_error("cannot use 'this' outside of a class", 0);
@@ -119,11 +561,9 @@ void pass2_const_or_var(ParseTree * current){
     else{
         S_primtype * constant = dynamic_cast<S_primtype *>(current->sem);
         if (constant){
-            cout << "actual constants tho" << endl;
             current->type = constant;
         }
         else{
-            cout << "CONSTANTS" << endl;
             semantics * found = scope->lookup(text);
 
             if (!found){
@@ -133,13 +573,13 @@ void pass2_const_or_var(ParseTree * current){
             S_variable * var = dynamic_cast<S_variable *>(found);
             if (var){
                 current->type = var->type;
+                current->sem = var;
             }
             /*else{
                 for(semantics *sem : all_decls){
                     S_class * isclass = dynamic_cast<S_class *>(sem);
                     S_interface * isinterface = dynamic_cast<S_interface *>(sem);
                     if (isclass){
-                        cout << "class found???" << endl;
                         if (isclass->name == current->token->text){
                             current->type = isclass;
                         }
@@ -191,7 +631,6 @@ void pass2_functions(ParseTree * functree){
 void pass2_return(ParseTree * retree){
     if(retree->children.size() > 1){
         ParseTree * ret_stmt = retree->children[1];
-        //cout << ret_stmt->description << endl;
         pass2(ret_stmt);
         retree->type = ret_stmt->type;
     }
@@ -249,12 +688,9 @@ void pass2_binop(ParseTree * bintree){
     else if(op == "="){
         //assignment type compatibility
         //Interface assignment type compatibility
-        cout << "assignment!" << endl;
-        //cout << scope->to_string() << endl;
         S_primtype * isprim = dynamic_cast<S_primtype *>(left->type);
         if (isprim){
             if(left->type->name != right->type->name){
-                cout << left->type->name << " " << right->type->name << endl;
                 semantic_error("Non-matching types for assignment expression", 0);
             }
             bintree->type = left->type;
@@ -272,7 +708,6 @@ void pass2_binop(ParseTree * bintree){
 
     else if(op == "&&" || op == "||"){
         //logical types match
-        cout << "logical" << endl;
         if(left->type->name != "bool" || right->type->name != "bool"){
             semantic_error("Non boolean values used in logical expression", 0);
         }
@@ -303,8 +738,23 @@ void pass2_uop(ParseTree * optree){
 
 
 void pass2_variables(ParseTree * vartree){
-    cout << "variable" << endl;
     S_variable * variable = dynamic_cast<S_variable *>(vartree->sem);
+
+    if((scope != topScope) and (currfunc)){
+        //find a way to check if we are in a function! (make sure we are tracking class, currfunc, and currclass)
+        //GO INTO FUNCTIONDECL AND MAKE SURE TO RESET TO 0 (OR 1 IF IN A CLASS)
+        variable->seq_num = curr_varnum;
+        curr_varnum += 1;
+        variable->genus = "local";
+    }
+    else if(is_in_a_class){
+        variable->genus = "instance";
+    }
+    else{
+        variable->genus = "global";
+    }
+
+    vartree->sem = variable;
 
     S_primtype * isprim = dynamic_cast<S_primtype *>(variable->type);
     if (isprim){
@@ -323,9 +773,9 @@ void pass2_variables(ParseTree * vartree){
 
     S_arraytype * isarray = dynamic_cast<S_arraytype *>(variable->type);
     if (isarray){
-        cout << "is an array!!" << endl;
         vartree->type = isarray;
     }
+
 }
 
 
@@ -428,9 +878,7 @@ void pass2_break(){
 }
 
 void pass2_print(ParseTree * printtree){
-    for (ParseTree * child : printtree->children){
-        pass2(child);
-    }
+    pass2(printtree->children[1]);
 }
 
 void pass2_readint(ParseTree * inttree){
@@ -465,7 +913,6 @@ void pass2_newarray(ParseTree * newtree){
     ParseTree * arrtype = newtree->children[1];
     pass2(num);
     pass2(arrtype);
-    cout << "array type: " <<  arrtype->type << endl;
 }
 
 void pass2_field_access(ParseTree * dottree){
@@ -538,8 +985,7 @@ void pass2_type(ParseTree * current){
 
 void pass2(ParseTree * current){
     //compatible types only for user-declared
-    cout << "description " << current->description << endl;
-
+    cout << current->description << endl;
     if (current->description.size() == 0){
         pass2_const_or_var(current);
     }
@@ -692,7 +1138,6 @@ void pass2(ParseTree * current){
     //may need to be an else
     else{
         for(ParseTree * child : current->children){
-            //cout << "makes it?" << " " << child->description << endl;
             pass2(child);
         }
     }
@@ -773,7 +1218,6 @@ int main(int argc, char **argv) {
   set<semantics *> marked;  // the declaration of a set of pointers to objects
 
   // after that, replace_undefined in all_decls.
-  // (The cout << ... is for debugging only.)
   for (semantics *sem : all_decls) {
       cout << "Replacing all undefined inside " << sem->to_string() << endl;
       sem->replace_undefined(topScope);
@@ -854,9 +1298,14 @@ int main(int argc, char **argv) {
   if (!found_main){
       semantic_error("Main not defined", 0);
   }
+
+  cout << "**********************No seg fault before pass 2**********************" << endl;
   // end of first pass.
   scope = topScope;
   pass2(top);
+
+  cout << "**********************No seg fault before code generation**********************" << endl;
+  code_generation(argv[1]);
 
   return 0;
 #endif
