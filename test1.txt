@@ -1,4 +1,5 @@
 void main(){
-    string a;
-    a = "hello";
+    if ("hello" == "hello"){
+    
+    }
 }

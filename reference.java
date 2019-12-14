@@ -6,6 +6,17 @@ public class reference{
     }
 
     static void main(){
-        System.out.print(true);
+        /*if(true){
+            System.out.print("Hello!");
+        }*/
+        /*int a;
+        boolean b;
+        String c;
+        double d;
+        a = 5;
+        b = true;
+        c = "Hello";
+        d = 2.5;*/
+        System.out.print(!false);
     }
 }

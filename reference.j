@@ -22,12 +22,13 @@
 .end method              
 
 .method                  static main()V
-   .limit stack          1
-   .limit locals         1
-   .line                 10
-   iconst_5              
-   istore_0              
-   .line                 11
+   .limit stack          2
+   .limit locals         0
+   .line                 20
+   getstatic             java/lang/System/out Ljava/io/PrintStream;
+   iconst_1              
+   invokevirtual         java/io/PrintStream/print(Z)V
+   .line                 21
    return                
 .end method              
 

@@ -33,7 +33,12 @@ S_function * currfunc = NULL;
 S_class * currclass;
 int curr_varnum = 0;
 
-
+/*struct Holder{
+    int itype;
+    float dtype;
+    bool btype;
+    string stype;
+};*/
 
 
 string cut_extension(string name){
@@ -67,6 +72,9 @@ char codetype(S_type * type){
         string thetype = ptype->name;
         char typeletter = thetype[0];
         typeletter = typeletter - 32;
+        if (typeletter == 'B'){
+            return 'Z';
+        }
         return typeletter;
     }
     return 'T';
@@ -134,6 +142,17 @@ void generating_functions(ParseTree * current, fstream & file){
 
 /*vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv*/
 
+string find_type(ParseTree * current){
+    S_primtype * ptype = dynamic_cast<S_primtype *>(current->type);
+    return ptype->name;
+}
+
+
+string evaluate_string(ParseTree * current){
+    return current->token->text;
+}
+
+
 int evaluate_int(ParseTree * current){
     //how do I handle readint?
     if(current->children.size() == 0){
@@ -173,6 +192,211 @@ int evaluate_int(ParseTree * current){
 }
 
 
+float evaluate_double(ParseTree * current){
+    //how do I handle readint?
+    if(current->children.size() == 0){
+        //only works if not a variable!!
+        return stof(current->token->text);
+    }
+    float value = 0;
+    if(current->description == "binop"){
+        string op = current->children[1]->token->text;
+        float lval = evaluate_int(current->children[0]);
+        float rval = evaluate_int(current->children[2]);
+
+        if (op == "+"){
+            value = lval + rval;
+        }
+        else if (op == "-"){
+            value = lval - rval;
+        }
+        else if (op == "/"){
+            value = lval / rval;
+        }
+        else if (op == "*"){
+            value = lval * rval;
+        }
+        //might need to find a way to make mods work for doubles
+        else if (op == "%"){
+            cout << "Cannot use modulus operator on doubles" << endl;
+            exit(1);
+        }
+
+    }
+    else if(current->description == "uop"){
+        //negation
+        float absvalue = evaluate_double(current->children[1]);
+        value = value - absvalue;
+    }
+    return value;
+}
+
+
+int evaluate_bool(ParseTree * current){
+    int value = 0;
+    if(current->children.size() == 0){
+        //only works if not a variable!!
+        string trueorfalse = current->token->text;
+        if(trueorfalse == "false"){
+            return 0;
+        }
+        else{
+            return 1;
+        }
+    }
+
+    if(current->description == "binop"){
+        string op = current->children[1]->token->text;
+        string lvaltype = find_type(current->children[0]);
+        //string rvaltype = find_type(current->children[2]);
+
+        //focuses on operands
+        /*Holder * left = new Holder;
+        Holder * right = new Holder;
+
+        if (lvaltype == "int"){
+            left->itype = evaluate_int(current->children[0]);
+            right->itype = evaluate_int(current->children[2]);
+        }
+        else if(lvaltype == "double"){
+            left->dtype = evaluate_double(current->children[0]);
+            right->dtype = evaluate_double(current->children[2]);
+        }
+        else if(lvaltype == "bool"){
+            left->btype = evaluate_bool(current->children[0]);
+            right->btype = evaluate_bool(current->children[2]);
+        }
+        else if(lvaltype == "string"){
+            left->stype = evaluate_string(current->children[0]);
+            right->stype = evaluate_string(current->children[2]);
+        }
+
+        //focuses on operator
+        if(op == "<" || op == "<=" || op == ">" || op == ">="){
+            //must be matching numbers
+        }
+        else if(op == "==" || op == "!="){
+            //must be same type
+        }
+        else if(op == "&&"){
+            //operands must be of bool type
+        }
+        else if(op == "||"){
+        }*/
+
+        if (lvaltype == "int"){
+            int lval = evaluate_int(current->children[0]);
+            int rval = evaluate_int(current->children[2]);
+
+            //must be matching numbers
+            if(op == "<"){
+                return (lval < rval);
+            }
+            else if (op == "<="){
+                return (lval <= rval);
+            }
+            else if (op == ">"){
+                return (lval > rval);
+            }
+            else if (op == ">="){
+                return (lval >= rval);
+            }
+
+            //must be same type
+            else if (op == "=="){
+                return (lval == rval);
+            }
+            else if (op == "!="){
+                return (lval != rval);
+            }
+
+            //operands must be of bool type
+            //only here to assist with copy/paste later
+            /*else if(op == "&&"){
+                return (lval && rval);
+            }
+            else if(op == "||"){
+                return (lval && rval);
+            }*/
+
+        }
+        else if(lvaltype == "double"){
+            float lval = evaluate_double(current->children[0]);
+            float rval = evaluate_double(current->children[2]);
+
+            if(op == "<"){
+                return (lval < rval);
+            }
+            else if (op == "<="){
+                return (lval <= rval);
+            }
+            else if (op == ">"){
+                return (lval > rval);
+            }
+            else if (op == ">="){
+                return (lval >= rval);
+            }
+
+            //must be same type
+            else if (op == "=="){
+                return (lval == rval);
+            }
+            else if (op == "!="){
+                return (lval != rval);
+            }
+
+        }
+        else if(lvaltype == "bool"){
+            bool lval = evaluate_bool(current->children[0]);
+            bool rval = evaluate_bool(current->children[2]);
+
+            //must be same type
+            if (op == "=="){
+                return (lval == rval);
+            }
+            else if (op == "!="){
+                return (lval != rval);
+            }
+
+            //operands must be of bool type
+            else if(op == "&&"){
+                return (lval && rval);
+            }
+            else if(op == "||"){
+                return (lval && rval);
+            }
+
+        }
+        else if(lvaltype == "string"){
+            string lval = evaluate_string(current->children[0]);
+            string rval = evaluate_string(current->children[2]);
+
+            //must be same type
+            if (op == "=="){
+                return (lval == rval);
+            }
+            else if (op == "!="){
+                return (lval != rval);
+            }
+        }
+    }
+
+    else if(current->description == "uop"){
+        //negation
+        int absvalue = evaluate_bool(current->children[1]);
+        if (absvalue == 0){
+            return 1;
+        }
+        else{
+            return 0;
+        }
+
+    }
+    return value;
+}
+
+
+
 
 /*^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
 
@@ -190,6 +414,13 @@ void generating_print(ParseTree * current, fstream & file){
             file << "   invokevirtual         java/io/PrintStream/println(Ljava/lang/String;)V" << endl;
         }
 
+        if (ptype->name == "bool"){
+            int value = evaluate_bool(current->children[1]->children[0]);
+            file << "   iconst_" << value << endl;
+            file << "   invokevirtual         java/io/PrintStream/print(Z)V" << endl;
+
+        }
+
         if (ptype->name == "int"){
             int value = evaluate_int(current->children[1]->children[0]);
             if ((value > -1) and (value < 6)){
@@ -200,8 +431,12 @@ void generating_print(ParseTree * current, fstream & file){
             }
             file << "   invokevirtual         java/io/PrintStream/println(I)V" << endl;
         }
-        if (ptype->name == "bool"){
-            
+
+        if (ptype->name == "double"){
+            //DOUBLE THE FREAK DOWN ON THIS ONE
+            float value = evaluate_double(current->children[1]->children[0]);
+            file << "   ldc2_w                " << value << endl;
+            file << "   invokevirtual         java/io/PrintStream/println(D)V" << endl;
         }
     }
 }
@@ -211,34 +446,34 @@ void generating_print(ParseTree * current, fstream & file){
 void generating_binops(ParseTree * current, fstream & file){
     if (current->children[1]->token->text == "="){
 
-        S_primtype * ptype = dynamic_cast<S_primtype *>(current->children[2]->);
-
+        S_primtype * ptype = dynamic_cast<S_primtype *>(current->children[2]->type);
+        //rhs
         if (ptype){
             if (ptype->name == "string"){
-                string output = current->children[1]->children[0]->token->text;
+                string output = current->children[2]->token->text;
                 file << "   ldc                   " << output << endl;
             }
 
             if (ptype->name == "int"){
-                int value = evaluate_int(current->children[1]->children[0]);
+                int value = evaluate_int(current->children[2]);
                 if ((value > -1) and (value < 6)){
                     file << "   iconst_" << value << endl;
                 }
                 else{
                     file << "   bipush                " << value << endl;
                 }
-                file << "   invokevirtual         java/io/PrintStream/println(I)V" << endl;
             }
         }
 
+        //lhs
         S_variable * lvalue = dynamic_cast<S_variable *>(current->children[0]->sem);
         if(lvalue){
             cout << lvalue->name << endl;
+            //genus options: local, global, instance
+            if (lvalue->genus == "local"){
+                file << "   istore_" << lvalue->seq_num << endl;
+            }
         }
-
-    }
-    if (file){
-
     }
 }
 
@@ -246,6 +481,15 @@ void generating_binops(ParseTree * current, fstream & file){
 
 
 
+
+void generating_if(ParseTree * current, fstream & file){
+    if (current){
+
+    }
+    if (file){
+
+    }
+}
 
 
 
@@ -265,6 +509,9 @@ void generating(ParseTree * current, fstream & file){
         //only do assign for now
         generating_binops(current, file);
     }
+    else if (current->description == "if"){
+        generating_if(current, file);
+    }
     else{
         for (ParseTree * child : current->children){
             generating(child, file);
@@ -278,10 +525,6 @@ void generating(ParseTree * current, fstream & file){
     else if (current->description == "return"){
         pass2_return(current);
 
-    }
-
-    else if (current->description == "binop"){
-        pass2_binop(current);
     }
 
     else if (current->description == "class"){

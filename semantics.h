@@ -30,7 +30,6 @@ struct Symtab {
   Symtab * parent;  // outer scope
 };
 
-
 void semantic_error(string msg, int line);
 void internal_error(string msg);
 

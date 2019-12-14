@@ -176,7 +176,7 @@ void pass2_binop(ParseTree * bintree){
         if(left->type->name != right->type->name){
             semantic_error("Non-matching types for arithmetic expression", 0);
         }
-        
+
         string type = left->type->name;
         if(type != "int" && type != "double"){
             semantic_error("Non-numeric types for arithmetic expression", 0);

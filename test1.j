@@ -21,6 +21,6 @@
 
 .method                  static main()V
    .limit stack          5
-   .limit locals         2
+   .limit locals         0
    return
 .end method
